@@ -2,7 +2,7 @@
 
 Dani To The Rescue (or danittr) is a game prototype made with the [pygame][] library. It is a platformer.
 
-![danittr screenshot](https://indiepython.com/images/danittr_screenshot.png)
+![danittr screenshot](https://indiepython.com/images/danittr_screenshot.jpg)
 
 I'm [Kennedy Richard S. Guerra](https://kennedyrichard.com), 31, and made this prototype as part of the [Indie Python](https://indiepython.com) project.
 
