@@ -32,12 +32,12 @@ That's all, but, if you encounter any problems, contact me with one of the metho
 
 ## Usage (controls)
 
-up, left, down, right: W, A, S, D
-jump: K
-fire: J
-interaction: E (talk to npc, pick items, save on satellites)
-advance dialogue/deny prompt: SPACE
-Accept prompt: ENTER
+- up, left, down, right: W, A, S, D
+- jump: K
+- fire: J
+- interaction: E (talk to npc, pick items, save on satellites)
+- advance dialogue/deny prompt: SPACE
+- accept prompt: ENTER
 
 
 ## Features
