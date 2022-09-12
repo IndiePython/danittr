@@ -1,6 +1,6 @@
 # Dani To The Rescue (game prototype)
 
-Dani To The Rescue (or danittr) is a game prototype made with the [pygame][] library. It is a platformer.
+Dani To The Rescue (or danittr) is a game prototype made with the [pygame](https://pygame.org) library. It is a platformer.
 
 ![danittr screenshot](https://indiepython.com/images/danittr_screenshot.jpg)
 
