@@ -1,5 +1,6 @@
 """Custom exceptions."""
 
+
 class ManagerSwitchException(Exception):
     """Raised when the update manager is switched.
 
@@ -13,11 +14,14 @@ class ManagerSwitchException(Exception):
         self.update_manager_name = update_manager_name
         super().__init__("Switching update manager.")
 
+
 class LevelSwitchException(ManagerSwitchException):
     """Raised when switching between levels."""
 
+
 class RestartLevelException(Exception):
     """Raise when player dies to restart level."""
+
 
 class QuitGameException(Exception):
     """Raised to quit the game loop."""

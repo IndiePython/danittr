@@ -10,28 +10,33 @@ from ..appcommon.signfactory import sign_factory
 class Sign(BasicObject):
     """A class to represent a sign or signpost.
 
-    ### ASCII art
-
-     _______        _______|\         _______|\ 
-    |       |      |         \       |         \ 
-    | Hello |  or  | Hello    \  or  | Hello    \ 
-    |_______|      |          /      |          /
-                   |_______  /       |_______  /
-                           |/           |  | |/
-                                        |  |
-                                        |__|
-
     The surfaces are generated in
     appcommon/signfactory.py
     """
 
+    #     _______        _______|\         _______|\
+    #    |       |      |         \       |         \
+    #    | Hello |  or  | Hello    \  or  | Hello    \
+    #    |_______|      |          /      |          /
+    #                   |_______  /       |_______  /
+    #                           |/           |  | |/
+    #                                        |  |
+    #                                        |__|
+
     level = None
 
-    def __init__(self, prop_name, coordinates, text,
-                 fg_color, bg_color, signpost_height=0,
-                 direction=None):
+    def __init__(
+        self,
+        prop_name,
+        coordinates,
+        text,
+        fg_color,
+        bg_color,
+        signpost_height=0,
+        direction=None,
+    ):
         """Initialize superclass and variables.
-        
+
         prop_name
             A string representing the prop name.
         coordinates
@@ -59,15 +64,14 @@ class Sign(BasicObject):
             but by a rectangle.
         """
         self.prop_name = prop_name
-        
-        self.image = sign_factory(text, fg_color, bg_color,
-                                  signpost_height,
-                                  direction)
-        
-        self.rect            = self.image.get_rect()
+
+        self.image = sign_factory(text, fg_color, bg_color, signpost_height, direction)
+
+        self.rect = self.image.get_rect()
         self.rect.bottomleft = coordinates
 
-        if signpost_height: self.rect.y += 4
+        if signpost_height:
+            self.rect.y += 4
 
         self.update = empty_function
 

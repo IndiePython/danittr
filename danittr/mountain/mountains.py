@@ -17,12 +17,12 @@ class Mountain(BasicObject):
 
     def __init__(self):
         """Position and perform setups.
-        
+
         bottomleft
             Bottomleft coordinates for a pygame.Rect instance.
         """
         self.image = render_image("mountain.png")
-        self.rect  = self.image.get_rect()
+        self.rect = self.image.get_rect()
         self.rect.midbottom = SCREEN_RECT.midbottom
 
         # 40: just an arbitrary value.
@@ -41,4 +41,4 @@ class Mountain(BasicObject):
         dy
             Integer indicating scrolling in y axis.
         """
-        self.rect.move_ip(dx/160, dy/180)
+        self.rect.move_ip(dx / 160, dy / 180)

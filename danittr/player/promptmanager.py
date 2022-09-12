@@ -19,7 +19,7 @@ class PromptManager:
         self.player = player
 
         self.image = INVISIBLE_SURF
-        self.rect  = self.image.get_rect()
+        self.rect = self.image.get_rect()
 
         self.prompt_display = None
 
@@ -27,15 +27,17 @@ class PromptManager:
 
     def draw(self):
         """Draw prompt display if available."""
-        try: self.prompt_display.draw()
+        try:
+            self.prompt_display.draw()
 
         ### attribute error due to prompt_display being
         ### None and this object lacking a draw method
-        except AttributeError: pass
+        except AttributeError:
+            pass
 
     def get_prompt(self, prompt):
         """Instantiate a prompt box.
-        
+
         prompt
             A tuple containing a pair of data. The
             first item includes the position where a surface
@@ -43,13 +45,12 @@ class PromptManager:
             is an action to be executed should the player
             confirm the prompt.
         """
-        prompt_pair   = prompt[0]
+        prompt_pair = prompt[0]
         prompt_action = prompt[1]
-        self.prompt_display = PromptDisplay(self,
-                                            self.player,
-                                            prompt_pair,
-                                            prompt_action)
-    
+        self.prompt_display = PromptDisplay(
+            self, self.player, prompt_pair, prompt_action
+        )
+
     def finish_prompt(self):
         """Set current prompt to None."""
         self.prompt_display = None
@@ -64,10 +65,9 @@ class PromptManager:
 class PromptDisplay(BasicObject):
     """Object for prompt."""
 
-    def __init__(self, manager, player, prompt_pair,
-                 prompt_action):
+    def __init__(self, manager, player, prompt_pair, prompt_action):
         """Initialize superclass and prepare sprites.
-        
+
         manager
             The instance of the player.PromptManager class.
         player
@@ -81,11 +81,11 @@ class PromptDisplay(BasicObject):
             confirm the prompt.
         """
         self.manager = manager
-        self.player  = player
+        self.player = player
 
         self.image = prompt_pair[1]
 
-        self.rect           = self.image.get_rect()
+        self.rect = self.image.get_rect()
         self.rect.midbottom = prompt_pair[0]
 
         self.confirm = prompt_action

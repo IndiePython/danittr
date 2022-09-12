@@ -2,7 +2,7 @@
 
 ### third party imports and setups
 
-from pygame       import init as init_pygame
+from pygame import init as init_pygame
 from pygame.mixer import pre_init
 
 ## sound pre initialization
@@ -13,9 +13,7 @@ init_pygame()
 
 ## extra pygame imports
 
-from pygame import (
-                   quit as quit_pygame,
-                   error as pygame_error)
+from pygame import quit as quit_pygame, error as pygame_error
 
 from pygame.event import clear as clear_events
 
@@ -30,15 +28,17 @@ from .music import MUSIC_MANAGER
 MUSIC_MANAGER.update()
 
 from .appcommon.exception import (
-                                       QuitGameException,
-                                       LevelSwitchException,
-                                       RestartLevelException,
-                                       ManagerSwitchException)
+    QuitGameException,
+    LevelSwitchException,
+    RestartLevelException,
+    ManagerSwitchException,
+)
 from .appcommon.behaviour.main import (
-                                       get_level,
-                                       load_game,
-                                       get_custom_manager,
-                                       reset_player_health)
+    get_level,
+    load_game,
+    get_custom_manager,
+    reset_player_health,
+)
 from .appcommon.behaviour.buffer import remove_buffers
 
 from .logconfig import APP_LOGGER
@@ -131,10 +131,11 @@ logger = APP_LOGGER.getChild(__name__)
 
 ### main function
 
+
 def run_game():
     """Run the game loop."""
     logger.info("Preparing to enter the game loop.")
-    
+
     ### get logo screen scene
     update_manager = get_custom_manager("logo_screen.scn")
 
@@ -170,11 +171,11 @@ def run_game():
 
         except ManagerSwitchException as err:
 
-
             if type(err) is LevelSwitchException:
                 logger.info("Switching between levels.")
 
-            else: logger.info("Switching to update manager.")
+            else:
+                logger.info("Switching to update manager.")
 
             # TODO adjust code below
 
@@ -185,10 +186,10 @@ def run_game():
                     update_manager = get_level(manager_name)
 
                 else:
-                    update_manager = \
-                        get_custom_manager(manager_name)
+                    update_manager = get_custom_manager(manager_name)
 
-            else: update_manager = manager_name
+            else:
+                update_manager = manager_name
 
             ### admin task: clear event queue
             clear_events()
@@ -212,9 +213,8 @@ def run_game():
 
         ### general error handlinlg
         except (Exception, pygame_error) as err:
-            print('here')
-            logger.exception(
-              "Exitting game due to unexpected exception.")
+            print("here")
+            logger.exception("Exitting game due to unexpected exception.")
 
             # XXX ponder about what to do here, there's
             # various possibilities and factors to consider
@@ -223,7 +223,7 @@ def run_game():
             quit_pygame()
 
             raise Exception from err
-    
+
     ### remove swap files
     remove_buffers()
 

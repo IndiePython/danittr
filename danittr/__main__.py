@@ -12,14 +12,16 @@ from .logconfig import APP_LOGGER
 ### instantiating local logger
 logger = APP_LOGGER.getChild(__name__)
 
+
 def main():
 
     logger.info("Launching game.")
     from .gameloop import run_game
+
     run_game()
 
 
 ### brief instructions for module execution
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

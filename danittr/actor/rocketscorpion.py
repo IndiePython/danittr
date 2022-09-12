@@ -10,7 +10,7 @@ class RocketScorpion(object):
 
     def __init__(self, prop_name, coordinates):
         """Initialize superclass and variables.
-        
+
         prop_name
             A string representing the prop name.
         coordinates
@@ -21,9 +21,11 @@ class RocketScorpion(object):
         self.prop_name = prop_name
 
         self.anim_player = AnimationPlayer(
-                                self, prop_name,
-                                coordinates_name="bottomleft",
-                                coordinates_value=coordinates)
+            self,
+            prop_name,
+            coordinates_name="bottomleft",
+            coordinates_value=coordinates,
+        )
 
         self.anim_player.play()
 

@@ -36,9 +36,10 @@ def does_touch_screen(obj):
     else:
         return False
 
+
 def get_objs_onscreen(group):
     """Return all objs which touch the screen.
-    
+
     group
         A appcommon.autoblit.BlitterSet object.
     """

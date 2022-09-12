@@ -6,61 +6,52 @@ because the player character can interact with them directly.
 This is the level used for the gameplay.
 """
 
-from shutil    import copyfile
-from os.path   import basename, dirname, isfile
+from shutil import copyfile
+from os.path import basename, dirname, isfile
 from functools import partial, partialmethod
 
 ### third-party imports
 
-from pygame import (
-                   QUIT, KEYDOWN,
-                   K_m, K_KP0, K_KP1, K_ESCAPE)
+from pygame import QUIT, KEYDOWN, K_m, K_KP0, K_KP1, K_ESCAPE
 
-from pygame.color   import THECOLORS
-from pygame.time    import set_timer
-from pygame.key     import get_pressed as get_pressed_keys
-from pygame.event   import (
-                           get as get_events,
-                           clear as clear_events)
+from pygame.color import THECOLORS
+from pygame.time import set_timer
+from pygame.key import get_pressed as get_pressed_keys
+from pygame.event import get as get_events, clear as clear_events
 from pygame.display import update
 
 ### local imports
 
 from ..config import (
-                   GAME_REFS,
-                   SCREEN, SCREEN_WIDTH, SCREEN_HEIGHT,
-                   SWITCH_LEVEL_TRIGGER, RESTART_FROM_SAVE,
-                   KEYS_MAP)
+    GAME_REFS,
+    SCREEN,
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
+    SWITCH_LEVEL_TRIGGER,
+    RESTART_FROM_SAVE,
+    KEYS_MAP,
+)
 
-from ..common.math import (
-                               calculate_jump,
-                               unscroll_coordinates)
+from ..common.math import calculate_jump, unscroll_coordinates
 from ..common.behaviour import CallList
 from ..common.jsonhandler import load_json, save_json
 from ..common.timehandler import get_isostring_datetime
 
-from ..appcommon.task import (
-                                 add_task,
-                                 update_task_manager,
-                                 clear_task_manager)
+from ..appcommon.task import add_task, update_task_manager, clear_task_manager
 from ..appcommon.surf import render_image
 from ..appcommon.dialog import clear_messages
 from ..appcommon.autoblit import BlitterSet
 from ..appcommon.exception import (
-                                 QuitGameException,
-                                 LevelSwitchException,
-                                 RestartLevelException,
-                                 ManagerSwitchException)
+    QuitGameException,
+    LevelSwitchException,
+    RestartLevelException,
+    ManagerSwitchException,
+)
 from ..appcommon.collision import get_objs_onscreen
-from ..appcommon.overrider import (
-                                 prepare_script,
-                                 perform_actions)
+from ..appcommon.overrider import prepare_script, perform_actions
 from ..appcommon.loadscreen import blit_loading_screen
 
-from .classes import (
-                              get_instance,
-                              insert_level_reference,
-                              remove_level_reference)
+from .classes import get_instance, insert_level_reference, remove_level_reference
 
 from ..player.main import Player
 
@@ -87,8 +78,7 @@ from ..palette import BLACK
 class GameLevel(object):
     """A interactive level class."""
 
-    def __init__(self, level_filepath,
-                 save_state_filepath, destination=None):
+    def __init__(self, level_filepath, save_state_filepath, destination=None):
         """Set variables and perform setups.
 
         level_filepath
@@ -105,9 +95,9 @@ class GameLevel(object):
             or on the last spot where s/he saved the game.
         """
         self.level_filepath = level_filepath
-        self.save_state_filepath = save_state_filepath 
+        self.save_state_filepath = save_state_filepath
 
-        self.level_name  = basename(level_filepath)
+        self.level_name = basename(level_filepath)
         self.destination = destination
 
         self.perform_level_data_setup()
@@ -125,30 +115,25 @@ class GameLevel(object):
         """
         ### Handle level swap file
 
-        self.level_swap_path = \
-                      "{}.swp".format(self.level_filepath)
+        self.level_swap_path = "{}.swp".format(self.level_filepath)
 
         if not isfile(self.level_swap_path):
-            copyfile(self.level_filepath,
-                     self.level_swap_path)
+            copyfile(self.level_filepath, self.level_swap_path)
 
         self.level_data = load_json(self.level_swap_path)
-        
+
         ### Handle state swap file
 
-        self.state_swap_path = \
-                   "{}.swp".format(self.save_state_filepath)
+        self.state_swap_path = "{}.swp".format(self.save_state_filepath)
 
         if not isfile(self.state_swap_path):
-            copyfile(self.save_state_filepath,
-                     self.state_swap_path)
+            copyfile(self.save_state_filepath, self.state_swap_path)
 
-        self.save_state_data = load_json(
-                                     self.state_swap_path)
+        self.save_state_data = load_json(self.state_swap_path)
 
     def initialize_level(self):
         """Set all variables and instantiate objects.
-        
+
         This sets all needed data as well as populate
         the level with the needed objects."""
         ### Initial setup
@@ -156,21 +141,21 @@ class GameLevel(object):
         blit_loading_screen()
 
         self.horizontal_scroll = self.vertical_scroll = 0
-        
+
         self.background = render_image("sky_background.png")
-        
+
         ### Setting game objects grouping
 
         self.objs_to_scroll = BlitterSet()
-        self.huds_group     = BlitterSet()
+        self.huds_group = BlitterSet()
 
         self.group_names = [
-          "back_props",
-          "middle_props",
-          "actors",
-          "equippable_items",
-          "blocks",
-          "front_props"
+            "back_props",
+            "middle_props",
+            "actors",
+            "equippable_items",
+            "blocks",
+            "front_props",
         ]
 
         self.group_map = {}
@@ -178,8 +163,8 @@ class GameLevel(object):
 
         for group_name in self.group_names:
 
-          self.group_map[group_name]    = BlitterSet()
-          self.onscreen_map[group_name] = BlitterSet()
+            self.group_map[group_name] = BlitterSet()
+            self.onscreen_map[group_name] = BlitterSet()
 
         insert_level_reference(self)
 
@@ -196,49 +181,45 @@ class GameLevel(object):
         set_scroll_handles(self)
 
         self.fps_display = fps_display
-    
 
         if not self.destination:
             self.scroll(
-                  self.level_data.get("horizontal_scroll", 0),
-                  self.level_data.get("vertical_scroll",   0))
+                self.level_data.get("horizontal_scroll", 0),
+                self.level_data.get("vertical_scroll", 0),
+            )
 
         self.set_player()
 
-        MUSIC_MANAGER.cue(
-                       self.level_data.get("mood", "casual"))
+        MUSIC_MANAGER.cue(self.level_data.get("mood", "casual"))
 
         ### Store event handling method references
 
-        self.normal_event_handling = \
-        CallList([
-          self.act_on_events,
-          self.act_on_key_input
-        ])
+        self.normal_event_handling = CallList(
+            [self.act_on_events, self.act_on_key_input]
+        )
 
         ### Assign methods to action routines
         self.get_control()
-    
+
     def set_group(self, group_name):
         """Configure props in group.
-        
+
         group_name
             A string representing the name of the group being
             set. This name is defined in the body of the
             initialize_level method.
         """
         group = self.group_map[group_name]
-        for obj_data in self.level_data.get(group_name,
-                                            set()):
+        for obj_data in self.level_data.get(group_name, set()):
             obj = get_instance(obj_data)
             obj.json_data = obj_data
             group.add(obj)
-        
+
         self.objs_to_scroll |= group
-    
+
     def add_obj_to_group(self, obj, group_name, at_end=False):
         """Add obj in level relevant groups.
-        
+
         obj
             Any gaming object.
         group_name
@@ -258,12 +239,11 @@ class GameLevel(object):
             callables = (
                 self.group_map[group_name].add,
                 self.onscreen_map[group_name].add,
-                self.objs_to_scroll.add
+                self.objs_to_scroll.add,
             )
 
             for callable_task in callables:
-                callable_partial = partial(callable_task,
-                                           obj)
+                callable_partial = partial(callable_task, obj)
                 add_task(callable_partial, 0)
 
         else:
@@ -272,8 +252,7 @@ class GameLevel(object):
             self.onscreen_map[group_name].add(obj)
             self.objs_to_scroll.add(obj)
 
-    def remove_obj_from_group(self, obj, group_name,
-                              at_end=False):
+    def remove_obj_from_group(self, obj, group_name, at_end=False):
         """Remove obj in level relevant groups.
 
         obj
@@ -295,26 +274,25 @@ class GameLevel(object):
             callables = (
                 self.group_map[group_name].remove,
                 self.onscreen_map[group_name].remove,
-                self.objs_to_scroll.remove
+                self.objs_to_scroll.remove,
             )
 
             for callable_task in callables:
-                callable_partial = partial(callable_task,
-                                           obj)
+                callable_partial = partial(callable_task, obj)
                 add_task(callable_partial, 0)
 
         else:
             self.group_map[group_name].remove(obj)
             self.onscreen_map[group_name].remove(obj)
             self.objs_to_scroll.remove(obj)
-    
+
     def set_escape_menu(self):
         """Set an escape menu for system options."""
         self.escape_menu = EscapeMenu(self)
 
     def set_tablet_menu(self):
         """Set a tablet menu, a gameplay display object.
-        
+
         The tablet menu as the name implies represents an
         electronic tablet and is as a convenience for
         players to remember gameplay data, check inventory and
@@ -322,10 +300,10 @@ class GameLevel(object):
         It isn't absolutely needed in gameplay.
         """
         self.tablet_menu = TabletMenu(self)
-    
+
     def set_player(self):
         """Configure player.
-        
+
         The player might need to be placed in a more general
         or specific position, depending on whether
         destination coordinates were provided on the
@@ -339,29 +317,28 @@ class GameLevel(object):
                     if prop.portal_name == self.destination:
                         start_position = prop.rect.bottomleft
 
-                except AttributeError: pass
+                except AttributeError:
+                    pass
 
         else:
 
-            start_position = \
-                self.level_data.get("player_position",
-                                    (640, 360))
+            start_position = self.level_data.get("player_position", (640, 360))
 
         health = self.save_state_data.get("health", 100)
         self.player = Player(
-                        unscroll_coordinates(start_position),
-                        level=self,
-                        state_data=self.save_state_data,
-                        health=health)
+            unscroll_coordinates(start_position),
+            level=self,
+            state_data=self.save_state_data,
+            health=health,
+        )
 
         if self.destination:
-            x_scrolling, y_scrolling = \
-                  calculate_jump(start_position)
+            x_scrolling, y_scrolling = calculate_jump(start_position)
             self.scroll(x_scrolling, y_scrolling)
 
     def get_onscreen_data(self):
         """Separate sprites on the screen.
-        
+
         This is done whenever the player 'enters' a new
         screen, that is, whenever s/he reaches the edges
         of the screen to enter a new one.
@@ -396,7 +373,7 @@ class GameLevel(object):
 
     def update(self):
         """Update objects in level instance.
-        
+
         When an instance of this class is the update manager,
         this method will be called. It is responsible for
         updating level objects. However, only those on the
@@ -409,7 +386,7 @@ class GameLevel(object):
         self.huds_group.update_objs()
 
         update_task_manager()
-    
+
     def draw(self):
         """Draw objects."""
         SCREEN.blit(self.background, (0, 0))
@@ -433,8 +410,7 @@ class GameLevel(object):
             elif event.type == KEYDOWN:
 
                 if event.key == K_ESCAPE:
-                    raise ManagerSwitchException(
-                                         self.escape_menu)
+                    raise ManagerSwitchException(self.escape_menu)
 
                 elif event.key == KEYS_MAP["advance_deny"]:
                     self.player.skip_interactions()
@@ -445,21 +421,19 @@ class GameLevel(object):
                 elif event.key == K_KP0:
 
                     if self.fps_display in self.huds_group:
-                        self.huds_group.remove(
-                                            self.fps_display)
+                        self.huds_group.remove(self.fps_display)
                     else:
                         self.huds_group.add(self.fps_display)
 
                 elif event.key == K_KP1:
 
-                    if self.scroll_barriers.issubset(
-                                           self.huds_group):
+                    if self.scroll_barriers.issubset(self.huds_group):
 
                         for item in self.scroll_barriers:
                             self.huds_group.remove(item)
 
-                    else: self.huds_group.update(
-                                       self.scroll_barriers)
+                    else:
+                        self.huds_group.update(self.scroll_barriers)
 
                 elif event.key == KEYS_MAP["interact"]:
                     self.player.interact()
@@ -482,16 +456,17 @@ class GameLevel(object):
             elif event.type == RESTART_FROM_SAVE:
                 set_timer(RESTART_FROM_SAVE, 0)
                 raise RestartLevelException
-    
+
     def act_on_key_input(self):
         """Perform actions based on key input."""
         key_input = get_pressed_keys()
 
-        player_left, player_right = \
-            (key_input[KEYS_MAP["player_left"]],
-             key_input[KEYS_MAP["player_right"]])
+        player_left, player_right = (
+            key_input[KEYS_MAP["player_left"]],
+            key_input[KEYS_MAP["player_right"]],
+        )
 
-        player_up   = key_input[KEYS_MAP["player_up"]]
+        player_up = key_input[KEYS_MAP["player_up"]]
         player_down = key_input[KEYS_MAP["player_down"]]
 
         if player_left and not player_right:
@@ -500,7 +475,8 @@ class GameLevel(object):
         elif player_right and not player_left:
             self.player.go_right()
 
-        else: self.player.stop()
+        else:
+            self.player.stop()
 
         if player_up and not player_down:
             self.player.up_action()
@@ -510,36 +486,30 @@ class GameLevel(object):
 
         elif not player_up and not player_down:
             self.player.stand_up()
-    
+
     def scroll(self, dx, dy):
         """Scroll all objects in x and y amounts.
-        
+
         dx, dy
             Integers representing scrolling in x and y
             axes, respectively.
         """
-        try: self.player.finish_dialogue()
+        try:
+            self.player.finish_dialogue()
 
-        except AttributeError: pass
+        except AttributeError:
+            pass
 
         self.horizontal_scroll += dx
-        self.vertical_scroll   += dy
+        self.vertical_scroll += dy
 
         self.objs_to_scroll.scroll(dx, dy)
         self.get_onscreen_data()
 
-    scroll_left  = partialmethod(scroll,
-                                 SCREEN_WIDTH,
-                                 0)
-    scroll_right = partialmethod(scroll,
-                                 -SCREEN_WIDTH,
-                                 0)
-    scroll_up    = partialmethod(scroll,
-                                 0,
-                                 SCREEN_HEIGHT)
-    scroll_down  = partialmethod(scroll,
-                                 0,
-                                 -SCREEN_HEIGHT)
+    scroll_left = partialmethod(scroll, SCREEN_WIDTH, 0)
+    scroll_right = partialmethod(scroll, -SCREEN_WIDTH, 0)
+    scroll_up = partialmethod(scroll, 0, SCREEN_HEIGHT)
+    scroll_down = partialmethod(scroll, 0, -SCREEN_HEIGHT)
 
     def switch_level(self):
         """Switch to next level."""
@@ -555,35 +525,31 @@ class GameLevel(object):
         del GAME_REFS.next_level
 
         raise LevelSwitchException(level_name)
-    
+
     def pre_saving_routine(self):
         """Execute pre-saving routines on game objects."""
         for obj in self.objs_to_scroll:
 
-            try: obj.pre_saving_routine()
+            try:
+                obj.pre_saving_routine()
 
-            except AttributeError: pass
+            except AttributeError:
+                pass
 
     def save_states_buffer(self):
         """Save level and game states on buffer."""
         ### Level states
 
-        self.level_data["player_position"] = \
-                                self.player.rect.bottomleft
-        self.level_data["horizontal_scroll"] = \
-                                self.horizontal_scroll
-        self.level_data["vertical_scroll"] = \
-                                self.vertical_scroll
+        self.level_data["player_position"] = self.player.rect.bottomleft
+        self.level_data["horizontal_scroll"] = self.horizontal_scroll
+        self.level_data["vertical_scroll"] = self.vertical_scroll
 
         save_json(self.level_data, self.level_swap_path)
 
         ### Game states
 
-        self.save_state_data["last_level"] = \
-                                   self.level_name
-        self.save_state_data["last_played_datetime"] = \
-                                   get_isostring_datetime()
-        self.save_state_data["health"] = \
-                             self.player.health
+        self.save_state_data["last_level"] = self.level_name
+        self.save_state_data["last_played_datetime"] = get_isostring_datetime()
+        self.save_state_data["health"] = self.player.health
 
         save_json(self.save_state_data, self.state_swap_path)

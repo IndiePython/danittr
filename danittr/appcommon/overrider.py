@@ -5,7 +5,7 @@ from pygame.event import pump
 
 class ControlOverrider:
     """An object to control and/or record gameplay actions.
-    
+
     It should be used to control game objects actions
     for various purposes.
 
@@ -76,7 +76,7 @@ class ControlOverrider:
 
     def perform_actions(self):
         """Perform scripted actions.
-        
+
         Such actions consist of the execution of
         instance methods of the objects the overrider is
         controlling according to a script (script as in
@@ -90,9 +90,9 @@ class ControlOverrider:
 OVERRIDER = ControlOverrider()
 
 register_actions = OVERRIDER.register_actions
-define_script    = OVERRIDER.define_script
-prepare_script   = OVERRIDER.prepare_script
-perform_actions  = OVERRIDER.perform_actions 
+define_script = OVERRIDER.define_script
+prepare_script = OVERRIDER.prepare_script
+perform_actions = OVERRIDER.perform_actions
 
 
 # XXX

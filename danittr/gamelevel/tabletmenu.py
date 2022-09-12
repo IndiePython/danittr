@@ -8,13 +8,10 @@ from collections import deque
 
 ### third-party imports
 
-from pygame import (
-                   Surface,
-                   QUIT, KEYDOWN, K_RETURN, K_ESCAPE,
-                   K_w, K_s, K_m)
+from pygame import Surface, QUIT, KEYDOWN, K_RETURN, K_ESCAPE, K_w, K_s, K_m
 
 from pygame.display import update
-from pygame.event   import get as get_events
+from pygame.event import get as get_events
 
 ### local imports
 
@@ -35,10 +32,10 @@ class TabletMenu(object):
         self.level = level
 
         self.widget_names = [
-          "Resume game",
-          "Save game",
-          "Quit to main menu",
-          "Quit to desktop"
+            "Resume game",
+            "Save game",
+            "Quit to main menu",
+            "Quit to desktop",
         ]
 
         self.set_background()
@@ -57,8 +54,8 @@ class TabletMenu(object):
         x_coordinate, y_coordinate = 620, 320
         for name in self.widget_names:
             self.menu_widgets.append(
-              TabletWidget(name, self, self.level,
-                           (x_coordinate,y_coordinate)))
+                TabletWidget(name, self, self.level, (x_coordinate, y_coordinate))
+            )
             y_coordinate += 50
 
         self.selected_item = self.menu_widgets[0]
@@ -67,13 +64,10 @@ class TabletMenu(object):
     def set_arrow_widget(self):
         """Create a highlight arrow for selected items."""
         self.arrow_widget = BasicObject()
-        self.arrow_widget.image = \
-                         self.font.render(">", True,
-                                          WHITE, BLACK)
-        self.arrow_widget.rect = \
-                     self.arrow_widget.image.get_rect()
+        self.arrow_widget.image = self.font.render(">", True, WHITE, BLACK)
+        self.arrow_widget.rect = self.arrow_widget.image.get_rect()
         x, y = self.selected_item.rect.topleft
-        self.arrow_widget.rect.topleft = (x-20, y)
+        self.arrow_widget.rect.topleft = (x - 20, y)
         self.widgets_group.add(self.arrow_widget)
 
     def control(self):
@@ -100,7 +94,7 @@ class TabletMenu(object):
     def update(self):
         """Update menu state."""
         x, y = self.selected_item.rect.topleft
-        self.arrow_widget.rect.topleft = (x-20, y)
+        self.arrow_widget.rect.topleft = (x - 20, y)
 
     def draw(self):
         """Draw objects."""
@@ -144,8 +138,7 @@ class TabletWidget(object):
         elif name == "Quit to desktop":
             self.action = self.exit_game
 
-        self.image = self.font.render(name, True,
-                                      WHITE, BLACK)
+        self.image = self.font.render(name, True, WHITE, BLACK)
         self.rect = self.image.get_rect()
         self.rect.topleft = topleft
 

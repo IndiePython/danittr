@@ -1,16 +1,14 @@
 """Facility for escape menu class and related tools."""
 
 from collections import deque
-from functools   import partialmethod
+from functools import partialmethod
 
 ### third-party imports
 
-from pygame import (
-                   QUIT, KEYDOWN, K_RETURN,
-                   K_ESCAPE, K_w, K_s)
+from pygame import QUIT, KEYDOWN, K_RETURN, K_ESCAPE, K_w, K_s
 
 from pygame.display import update
-from pygame.event   import get as get_events
+from pygame.event import get as get_events
 
 ### local imports
 
@@ -18,9 +16,7 @@ from ..config import SCREEN, GAME_REFS
 
 from ..appcommon.surf import render_rect
 from ..appcommon.autoblit import BlitterSet, BasicObject
-from ..appcommon.exception import (
-                                       QuitGameException,
-                                       ManagerSwitchException)
+from ..appcommon.exception import QuitGameException, ManagerSwitchException
 from ..appcommon.text.main import render_text
 from ..appcommon.behaviour.buffer import remove_buffers
 
@@ -34,17 +30,13 @@ class EscapeMenu(object):
 
     def __init__(self, level):
         """Initialize instance.
-        
+
         level
             the instance of gamelevel.main.Level."""
         self.font_size = 32
-        self.level     = level
+        self.level = level
 
-        self.widget_names = [
-          "Resume game",
-          "Quit to main menu",
-          "Quit to desktop"
-        ]
+        self.widget_names = ["Resume game", "Quit to main menu", "Quit to desktop"]
 
         self.background = render_rect(400, 420)
         self.build_items()
@@ -55,9 +47,7 @@ class EscapeMenu(object):
         self.menu_widgets = deque()
         x, y = 620, 320
         for name in self.widget_names:
-            escape_menu_widget = \
-                    EscapeMenuWidget(name, self,
-                                     self.level, (x,y))
+            escape_menu_widget = EscapeMenuWidget(name, self, self.level, (x, y))
             self.menu_widgets.append(escape_menu_widget)
             y += 50
 
@@ -69,14 +59,14 @@ class EscapeMenu(object):
     def set_arrow_widget(self):
         """Create a highlight arrow for selected items."""
         self.arrow_widget = BasicObject()
-        self.arrow_widget.image = \
-            render_text(">", font_size=self.font_size,
-                               foreground_color=WHITE,
-                               background_color=BLACK)
-        self.arrow_widget.rect = \
-                     self.arrow_widget.image.get_rect()
-        self.arrow_widget.rect.midright \
-                            = self.selected_item.rect.midleft
+        self.arrow_widget.image = render_text(
+            ">",
+            font_size=self.font_size,
+            foreground_color=WHITE,
+            background_color=BLACK,
+        )
+        self.arrow_widget.rect = self.arrow_widget.image.get_rect()
+        self.arrow_widget.rect.midright = self.selected_item.rect.midleft
         self.widgets_group.add(self.arrow_widget)
 
     def control(self):
@@ -102,8 +92,7 @@ class EscapeMenu(object):
 
     def update(self):
         """Update menu state."""
-        self.arrow_widget.rect.midright \
-                          = self.selected_item.rect.midleft
+        self.arrow_widget.rect.midright = self.selected_item.rect.midleft
 
     def draw(self):
         """Draw objects."""
@@ -117,8 +106,8 @@ class EscapeMenu(object):
         self.menu_widgets.rotate(amount)
         self.selected_item = self.menu_widgets[0]
 
-    select_previous = partialmethod(rotate_selection,  1)
-    select_next     = partialmethod(rotate_selection, -1)
+    select_previous = partialmethod(rotate_selection, 1)
+    select_next = partialmethod(rotate_selection, -1)
 
     def invoke_item_action(self):
         """Invoke the action on selected menu item."""
@@ -144,9 +133,9 @@ class EscapeMenuWidget(object):
         """
         self.font_size = 32
 
-        self.name        = name
+        self.name = name
         self.escape_menu = escape_menu
-        self.level       = level
+        self.level = level
 
         if name == "Resume game":
             self.action = self.resume_game
@@ -155,10 +144,12 @@ class EscapeMenuWidget(object):
         elif name == "Quit to desktop":
             self.action = self.exit_game
 
-        self.image = \
-            render_text(name, font_size=self.font_size,
-                               foreground_color=WHITE,
-                               background_color=BLACK)
+        self.image = render_text(
+            name,
+            font_size=self.font_size,
+            foreground_color=WHITE,
+            background_color=BLACK,
+        )
         self.rect = self.image.get_rect()
         self.rect.topleft = topleft
 

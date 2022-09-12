@@ -16,10 +16,9 @@ from ...font import get_font
 # cases where this would be useful.
 
 
-def get_text_size(text, font_size=22, font_style="default",
-                  padding=5):
+def get_text_size(text, font_size=22, font_style="default", padding=5):
     """Return surf size of text as if it were rendered.
-    
+
     text
         Any string.
     font_size
@@ -37,37 +36,47 @@ def get_text_size(text, font_size=22, font_style="default",
     padded_size = width + increment, height + increment
     return padded_size
 
+
 def fit_text(text, font, max_width, ommit_direction):
     """Return optimal text to fit max_width passed."""
     ### if text as it fits width, then return earlier
     if not font.size(text)[0] > max_width:
         return text
 
-    if ommit_direction == 'left':
+    if ommit_direction == "left":
         slice_obj = slice(1, None)
     else:
         slice_obj = slice(None, -1)
 
     for _ in range(len(text)):
         text = text[slice_obj]
-        if not font.size(text)[0] > max_width: break
+        if not font.size(text)[0] > max_width:
+            break
 
-    if ommit_direction == 'left':
-        text = '...' + text[3:]
+    if ommit_direction == "left":
+        text = "..." + text[3:]
     else:
-        text = text[:-3] + '...'
+        text = text[:-3] + "..."
 
     return text
 
+
 def render_text(
-    text, font_size=22,
-    foreground_color=BLACK, background_color=(*BLACK, 0),
-    antialiased=True, font_style="default",
-    padding=5, max_width=0, ommit_direction="right",
+    text,
+    font_size=22,
+    foreground_color=BLACK,
+    background_color=(*BLACK, 0),
+    antialiased=True,
+    font_style="default",
+    padding=5,
+    max_width=0,
+    ommit_direction="right",
     return_obj=False,
-    coordinates_name="topleft", coordinates_value=(0, 0)):
+    coordinates_name="topleft",
+    coordinates_value=(0, 0),
+):
     """Return surface or object representing rendered text.
-    
+
     text
         Any string.
     font_size
@@ -117,21 +126,19 @@ def render_text(
 
     if max_width:
         max_width = abs(max_width)
-        text = fit_text(
-                     text, font, max_width, ommit_direction)
+        text = fit_text(text, font, max_width, ommit_direction)
 
     ### define background alpha for next operations
 
-    try: has_transparency = background_color[3] < 255
-    except IndexError: has_transparency = False
+    try:
+        has_transparency = background_color[3] < 255
+    except IndexError:
+        has_transparency = False
 
     ### render and adjust text surface according to
     ### background alpha
 
-    text_surf = font.render(
-                        text, antialiased,
-                        foreground_color
-                        ).convert_alpha()
+    text_surf = font.render(text, antialiased, foreground_color).convert_alpha()
 
     if has_transparency:
 
@@ -140,11 +147,10 @@ def render_text(
         bg.blit(text_surf, (0, 0))
         surf = bg
 
-    else: surf = font.render(
-                      text, antialiased,
-                      foreground_color,
-                      background_color).convert()
-
+    else:
+        surf = font.render(
+            text, antialiased, foreground_color, background_color
+        ).convert()
 
     ### apply padding if requested
 
@@ -154,19 +160,15 @@ def render_text(
 
         ## calculate final width
         width, height = surf.get_size()
-        new_width, new_height = \
-            (width + (2 * padding), height+ (2 * padding))
+        new_width, new_height = (width + (2 * padding), height + (2 * padding))
 
         ## create new background surface with appropriate
         ## color according to presence of transparency
         if has_transparency:
-            new_bg = Surface(
-                         (new_width, new_height)
-                       ).convert_alpha()
+            new_bg = Surface((new_width, new_height)).convert_alpha()
 
-        else: new_bg = Surface(
-                         (new_width, new_height)
-                       ).convert()
+        else:
+            new_bg = Surface((new_width, new_height)).convert()
 
         new_bg.fill(background_color)
 
@@ -181,12 +183,12 @@ def render_text(
         obj.image = surf
 
         obj.rect = obj.image.get_rect()
-        setattr(obj.rect,
-                coordinates_name, coordinates_value)
+        setattr(obj.rect, coordinates_name, coordinates_value)
 
         return obj
 
-    else: return surf
+    else:
+        return surf
 
 
 def get_str_slices(text, font_size, max_width):
@@ -223,7 +225,7 @@ def get_str_slices(text, font_size, max_width):
 
             ## trim last word from text and stack on 'trimmed'
 
-            lsi  = text.rfind(" ") # lsi = last_space_index 
+            lsi = text.rfind(" ")  # lsi = last_space_index
             text, trimmed = text[:lsi], text[lsi:] + trimmed
 
         ## otherwise store text lstripped text

@@ -11,14 +11,19 @@ class AutoLabel(Label):
     """A label with custom autoupdating ability."""
 
     def __init__(
-        self, monitor_routine, prefix="", suffix="",
+        self,
+        monitor_routine,
+        prefix="",
+        suffix="",
         text="",
         *,
-        font_size=22, font_style="default",
+        font_size=22,
+        font_style="default",
         foreground_color=BLACK,
         background_color=(*BLACK, 0),
         coordinates_name="topleft",
-        coordinates_value=(0, 0)):
+        coordinates_value=(0, 0)
+    ):
         """Perform setups and assign data for reuse.
 
         Extends appcommon.text.label.main.Label.__init__
@@ -68,12 +73,13 @@ class AutoLabel(Label):
 
         ### initialize superclass
         super().__init__(
-          text, font_size=font_size,
-          font_style=font_style,
-          foreground_color=foreground_color,
-          background_color=background_color,
-          coordinates_name=coordinates_name,
-          coordinates_value=coordinates_value
+            text,
+            font_size=font_size,
+            font_style=font_style,
+            foreground_color=foreground_color,
+            background_color=background_color,
+            coordinates_name=coordinates_name,
+            coordinates_value=coordinates_value,
         )
 
         ### override update behaviour from Label superclass
@@ -90,7 +96,6 @@ class AutoLabel(Label):
         updates the contents of the label if they have
         changed.
         """
-        text = \
-          self.prefix + self.monitor_routine() + self.suffix
+        text = self.prefix + self.monitor_routine() + self.suffix
 
         self.set(text)

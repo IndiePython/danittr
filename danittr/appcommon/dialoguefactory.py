@@ -4,20 +4,16 @@ from math import pi
 
 ### third-party imports
 
-from pygame      import Rect
-from pygame.draw import rect    as draw_rect
-from pygame.draw import circle  as draw_circle
-from pygame.draw import line    as draw_line
-from pygame.draw import arc     as draw_arc
+from pygame import Rect
+from pygame.draw import rect as draw_rect
+from pygame.draw import circle as draw_circle
+from pygame.draw import line as draw_line
+from pygame.draw import arc as draw_arc
 from pygame.draw import polygon as draw_polygon
 
 ### local imports
 
-from ..palette import (
-                                    BLACK,
-                                    ARBITRARY_COLORKEY,
-                                    DIALOGUEBOX_BACKGROUND,
-                                    has_same_rgb)
+from ..palette import BLACK, ARBITRARY_COLORKEY, DIALOGUEBOX_BACKGROUND, has_same_rgb
 from .surf import render_rect
 from .text.main import render_text
 
@@ -31,9 +27,8 @@ from .text.main import render_text
 
 
 def dialoguebox_factory(
-                dialogue,
-                object_pos=None,
-                background_color=DIALOGUEBOX_BACKGROUND):
+    dialogue, object_pos=None, background_color=DIALOGUEBOX_BACKGROUND
+):
     """Return a list of interlocutor/surface pairs.
 
     ### ASCII art: generated surfaces take this final form:
@@ -80,17 +75,18 @@ def dialoguebox_factory(
         for line in dialogue:
             for key in line:
                 if key != "player":
-                    msg = "object_pos must be provided " \
-                          + "an interlocutor other than " \
-                          + "player speaks."
+                    msg = (
+                        "object_pos must be provided "
+                        + "an interlocutor other than "
+                        + "player speaks."
+                    )
                     raise ValueError(msg)
 
     if has_same_rgb(background_color, ARBITRARY_COLORKEY):
-        msg = "'background_color' can't be equal to" \
-              + " 'ARBITRARY_COLORKEY' constant."
+        msg = "'background_color' can't be equal to" + " 'ARBITRARY_COLORKEY' constant."
         raise ValueError(msg)
 
-    bg_color     = background_color
+    bg_color = background_color
     common_width = 4
 
     dialogue_boxes = []
@@ -103,9 +99,9 @@ def dialoguebox_factory(
         else:
             interlocutor_pos = "player_pos"
 
-        text_surf = render_text(line_str, font_size=22,
-                                       foreground_color=BLACK,
-                                       padding=0)
+        text_surf = render_text(
+            line_str, font_size=22, foreground_color=BLACK, padding=0
+        )
 
         box_width = text_surf.get_size()[0] + 40
 
@@ -124,15 +120,15 @@ def dialoguebox_factory(
         #    |_________|     |
         #
         #
-        rect1 = Rect(( 0, 20), (box_width,       5))
-        rect2 = Rect((20,  0), (box_width - 40, 45))
+        rect1 = Rect((0, 20), (box_width, 5))
+        rect2 = Rect((20, 0), (box_width - 40, 45))
         draw_rect(surf, bg_color, rect1)
-        draw_rect(surf, bg_color, rect2) 
+        draw_rect(surf, bg_color, rect2)
 
         ## 04 circles
         #
         # tlpos _________ trpos
-        #    __.         .__ 
+        #    __.         .__
         #   |__.         .__|
         # blpos|_________| brpos
         #
@@ -143,86 +139,72 @@ def dialoguebox_factory(
         # Also, in next code blocks,
         # tl means topleft, tr means topright,
         # bl means bottomleft and  br means bottomright.
-        tlpos, trpos, blpos, brpos = \
-                              ((20, 20), (box_width-20, 20),
-                               (20, 25), (box_width-20, 25))
+        tlpos, trpos, blpos, brpos = (
+            (20, 20),
+            (box_width - 20, 20),
+            (20, 25),
+            (box_width - 20, 25),
+        )
         radius = 20
         draw_circle(surf, bg_color, tlpos, radius)
         draw_circle(surf, bg_color, trpos, radius)
         draw_circle(surf, bg_color, blpos, radius)
         draw_circle(surf, bg_color, brpos, radius)
 
-
         ### Dialogue box outlines and final touches
 
         # 04 arc
         # will be drawn around the round corners of the
         # volume
-        arc_rect1 = Rect((           0, 0), (40, 40))
-        arc_rect2 = Rect((           0, 8), (40, 40))
-        arc_rect3 = Rect((box_width-41, 0), (40, 40))
-        arc_rect4 = Rect((box_width-40, 8), (40, 40))
+        arc_rect1 = Rect((0, 0), (40, 40))
+        arc_rect2 = Rect((0, 8), (40, 40))
+        arc_rect3 = Rect((box_width - 41, 0), (40, 40))
+        arc_rect4 = Rect((box_width - 40, 8), (40, 40))
 
-        startangle1, startangle2, startangle3, startangle4 = \
-               pi/2,          pi,           0,    (3*pi)/2
+        startangle1, startangle2, startangle3, startangle4 = pi / 2, pi, 0, (3 * pi) / 2
 
-        endangle1, endangle2, endangle3, endangle4 = \
-               pi,  (3*pi)/2,      pi/2,         0
+        endangle1, endangle2, endangle3, endangle4 = pi, (3 * pi) / 2, pi / 2, 0
 
-        draw_arc(surf, BLACK, arc_rect1,
-                 startangle1, endangle1, common_width)
-        draw_arc(surf, BLACK, arc_rect2,
-                 startangle2, endangle2, common_width)
-        draw_arc(surf, BLACK, arc_rect3,
-                 startangle3, endangle3, common_width)
-        draw_arc(surf, BLACK, arc_rect4,
-                 startangle4, endangle4, common_width)
+        draw_arc(surf, BLACK, arc_rect1, startangle1, endangle1, common_width)
+        draw_arc(surf, BLACK, arc_rect2, startangle2, endangle2, common_width)
+        draw_arc(surf, BLACK, arc_rect3, startangle3, endangle3, common_width)
+        draw_arc(surf, BLACK, arc_rect4, startangle4, endangle4, common_width)
 
         # eliminating artifacts in the drawn arcs
-        square = Rect((box_width-22, 48), (4, 4))
+        square = Rect((box_width - 22, 48), (4, 4))
         draw_rect(surf, ARBITRARY_COLORKEY, square)
 
         for i in range(3):
             arc_rect1.y += 1
-            draw_arc(surf, BLACK, arc_rect1,
-                     startangle1, endangle1, 1)
+            draw_arc(surf, BLACK, arc_rect1, startangle1, endangle1, 1)
         for i in range(2):
             arc_rect1.x += 1
-            draw_arc(surf, BLACK, arc_rect1,
-                     startangle1, endangle1, 1)
+            draw_arc(surf, BLACK, arc_rect1, startangle1, endangle1, 1)
 
         for i in range(3):
             arc_rect2.y += -1
-            draw_arc(surf, BLACK, arc_rect2,
-                     startangle2, endangle2, 1)
+            draw_arc(surf, BLACK, arc_rect2, startangle2, endangle2, 1)
         for i in range(2):
             arc_rect2.x += 1
-            draw_arc(surf, BLACK, arc_rect2,
-                     startangle2, endangle2, 1)
+            draw_arc(surf, BLACK, arc_rect2, startangle2, endangle2, 1)
 
         for i in range(3):
             arc_rect3.y += 1
-            draw_arc(surf, BLACK, arc_rect3,
-                     startangle3, endangle3, 1)
+            draw_arc(surf, BLACK, arc_rect3, startangle3, endangle3, 1)
         for i in range(2):
             arc_rect3.x += -1
-            draw_arc(surf, BLACK, arc_rect3,
-                     startangle3, endangle3, 1)
+            draw_arc(surf, BLACK, arc_rect3, startangle3, endangle3, 1)
         arc_rect3.x += 3
-        draw_arc(surf, BLACK, arc_rect3,
-                 startangle3, endangle3, 1)
+        draw_arc(surf, BLACK, arc_rect3, startangle3, endangle3, 1)
         arc_rect3.y -= 3
-        draw_arc(surf, BLACK, arc_rect3,
-                 startangle3, endangle3, 1)
+        draw_arc(surf, BLACK, arc_rect3, startangle3, endangle3, 1)
 
         for i in range(3):
             arc_rect4.y += -1
-            draw_arc(surf, BLACK, arc_rect4,
-                     startangle4, endangle4, 1)
+            draw_arc(surf, BLACK, arc_rect4, startangle4, endangle4, 1)
         for i in range(2):
             arc_rect4.x += -1
-            draw_arc(surf, BLACK, arc_rect4,
-                     startangle4, endangle4, 1)
+            draw_arc(surf, BLACK, arc_rect4, startangle4, endangle4, 1)
 
         # 04 lines
         # will be drawn to outline the straight sections
@@ -235,10 +217,10 @@ def dialoguebox_factory(
         # |               |
         # (_______________)
         #
-        start1, end1 = (         20,  1), (box_width-20,  1)
-        start2, end2 = (         19, 45), (box_width-20, 45)
-        start3, end3 = (          1, 19), (           1, 27)
-        start4, end4 = (box_width-3, 20), (box_width- 3, 27)
+        start1, end1 = (20, 1), (box_width - 20, 1)
+        start2, end2 = (19, 45), (box_width - 20, 45)
+        start3, end3 = (1, 19), (1, 27)
+        start4, end4 = (box_width - 3, 20), (box_width - 3, 27)
         draw_line(surf, BLACK, start1, end1, common_width)
         draw_line(surf, BLACK, start2, end2, common_width)
         draw_line(surf, BLACK, start3, end3, common_width)
@@ -253,14 +235,14 @@ def dialoguebox_factory(
         #
         # It will be drawn over the outline of the volume
         # so that it appear to be part of the box.
-        mid       = round(box_width/2)
-        pointlist = ((mid, 64), (mid-20, 44), (mid+20, 44))
+        mid = round(box_width / 2)
+        pointlist = ((mid, 64), (mid - 20, 44), (mid + 20, 44))
         draw_polygon(surf, bg_color, pointlist)
 
         # then we outline the part of the triangle
         # outside the volume
-        start1, end1 = (mid-20, 44), (mid, 64)
-        start2, end2 = (mid+20, 44), (mid, 64)
+        start1, end1 = (mid - 20, 44), (mid, 64)
+        start2, end2 = (mid + 20, 44), (mid, 64)
         draw_line(surf, BLACK, start1, end1, common_width)
         draw_line(surf, BLACK, start2, end2, common_width)
 

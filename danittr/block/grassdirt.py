@@ -1,8 +1,8 @@
 """Facility for grass and dirt block sprite."""
 
 from functools import partial
-from random    import seed, randint
-from types     import SimpleNamespace
+from random import seed, randint
+from types import SimpleNamespace
 
 from ..appcommon.anim.player.main import AnimationPlayer
 from ..appcommon.task import add_task
@@ -21,9 +21,10 @@ def get_distance(pos, item):
 
 ### class definition
 
+
 class GrassDirtBlock:
     """A block with dirt and grass.
-    
+
     The grass responds to player movement when walking
     over it."""
 
@@ -32,17 +33,19 @@ class GrassDirtBlock:
     def __init__(self, prop_name, coordinates):
         """Initialize superclass and variables."""
         self.prop_name = prop_name
-        
+
         self.anim_player = AnimationPlayer(
-                               self, prop_name,
-                               coordinates_name="bottomleft",
-                               coordinates_value=coordinates)
+            self,
+            prop_name,
+            coordinates_name="bottomleft",
+            coordinates_value=coordinates,
+        )
 
         self.perform_setups()
 
     def perform_setups(self):
         """Perform extra setups.
-        
+
         Those setups are either extra processing done
         to embellish in game stuff or controls, like
         flags to keep track of states.
@@ -55,22 +58,18 @@ class GrassDirtBlock:
         # more varied and beautiful.
         steps_no = randint(0, 1)
 
-        obj_name_list = \
-            [
-          obj.name
-          for obj in self.anim_player.get_nodes(
-                                         exclude_root=True)
+        obj_name_list = [
+            obj.name for obj in self.anim_player.get_nodes(exclude_root=True)
         ]
 
-        self.anim_player.update_nodes(
-                               steps_no, obj_name_list)
+        self.anim_player.update_nodes(steps_no, obj_name_list)
 
         ### store the nodes representing the grass patches
 
         self.patches = [
-          obj
-          for obj in self.anim_player.get_nodes()
-          if obj.name.startswith("grass_patch")
+            obj
+            for obj in self.anim_player.get_nodes()
+            if obj.name.startswith("grass_patch")
         ]
 
     def update(self):
@@ -108,9 +107,7 @@ class GrassDirtBlock:
         """
         obj_name = self.select_stomped_grass(pos)
 
-        callable_task = \
-          partial(
-            self.anim_player.update_nodes, 1, [obj_name])
+        callable_task = partial(self.anim_player.update_nodes, 1, [obj_name])
 
         self.patch_task = add_task(callable_task, 25)
 

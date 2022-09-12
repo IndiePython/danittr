@@ -36,11 +36,12 @@ def get_reaching_multiple(step_length, total_distance):
         return step_length
     else:
         steps_no = total_distance // step_length
-        rest     = total_distance %  step_length
+        rest = total_distance % step_length
         if rest:
             return step_length * (steps_no + 1)
         else:
             return step_length * steps_no
+
 
 def calculate_jump(coordinates):
     """Return how much scroll is needed to reach coordinates.
@@ -53,7 +54,7 @@ def calculate_jump(coordinates):
     calculate_jump -> (x, y)
 
     x and y are integers.
-    
+
     coordinates
         Reference point towards which to scroll.
 
@@ -76,12 +77,13 @@ def calculate_jump(coordinates):
     x, y = coordinates
 
     horizontal_jumps = x // SCREEN_WIDTH
-    vertical_jumps   = y // SCREEN_HEIGHT
+    vertical_jumps = y // SCREEN_HEIGHT
 
     horizontal_scroll = horizontal_jumps * SCREEN_WIDTH
-    vertical_scroll   = vertical_jumps   * SCREEN_HEIGHT
+    vertical_scroll = vertical_jumps * SCREEN_HEIGHT
 
     return (-horizontal_scroll, -vertical_scroll)
+
 
 def unscroll_coordinates(coordinates):
     """Return unscrolled coordinates.
@@ -114,7 +116,7 @@ def unscroll_coordinates(coordinates):
         Just a point consisting of a list or tuple with
         two integer coordinates.
     """
-    abs_x, abs_y   = coordinates
+    abs_x, abs_y = coordinates
 
     rest_x = abs_x % SCREEN_WIDTH
     rest_y = abs_y % SCREEN_HEIGHT
@@ -123,19 +125,20 @@ def unscroll_coordinates(coordinates):
 
     return unscrolled_coordinates
 
+
 def get_straight_distance(point_a, point_b):
     """Calculate the straight distance between two points.
 
     get_straight_distance(point_a, point_b) -> float
-    
+
     point_a, point_b
         Each is represented by a list or tuple with two
         values: x and y respectively. For instance: (x, y).
 
     Illustration:
-                 ._ _ 
+                 ._ _
         (point a)|\   |
-                 | \s | 
+                 | \s |
               dy |  \ |
                  |   \|
                  |_ _ .(point b)
@@ -145,7 +148,7 @@ def get_straight_distance(point_a, point_b):
         s  = the straight distance  (straight_distance)
         dy = the distance on y axis (distance_x)
         dx = the distance on x axis (distance_y)
-    
+
     >>> a, b = (10, 10), (20, 20)
     >>> round(get_straight_distance(a, b), 2)
     14.14
@@ -180,7 +183,7 @@ def offset_point(point, offset):
     offset
         A list or tuple containing two integers representing
         amounts to be added to each point coordinate.
-    
+
     >>> offset_point((10, 10), (5, 5))
     (15, 15)
     >>> offset_point((10, 10), (-5, 5))
@@ -196,6 +199,7 @@ def offset_point(point, offset):
     offset_point = [x + x_offset, y + y_offset]
 
     return offset_point
+
 
 def invert_point(point, invert_x, invert_y):
     """Return point with inverted coordinates as requested.

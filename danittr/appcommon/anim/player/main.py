@@ -1,6 +1,6 @@
 """Facility for animation playback."""
 
-from copy      import deepcopy
+from copy import deepcopy
 from functools import partialmethod
 
 ### third-party import
@@ -26,9 +26,10 @@ from .utils import Utilities
 # because this kind of setup means extra overhead for
 # real time processing (even if just a little);
 
+
 class AnimationPlayer(Utilities):
     """Plays animation.
-    
+
     This object receives a filepath and passes it to
     a factory function used to generate animation
     data. The animation data is then used to instantiate
@@ -49,10 +50,7 @@ class AnimationPlayer(Utilities):
     appcommon/anim/ani2d_interface.rst
     """
 
-    def __init__(
-        self,
-        game_obj, anim_data_key,
-        coordinates_value, coordinates_name):
+    def __init__(self, game_obj, anim_data_key, coordinates_value, coordinates_name):
         """Store data and perform setups.
 
         game_obj (any 'object' subclass)
@@ -81,9 +79,9 @@ class AnimationPlayer(Utilities):
 
         ## retrieve and store animation data
 
-        self.values     = anim_data["values"]
-        self.structure  = anim_data["structure"]
-        self.metadata   = anim_data["metadata"]
+        self.values = anim_data["values"]
+        self.structure = anim_data["structure"]
+        self.metadata = anim_data["metadata"]
         self.nodes_data = anim_data["nodes"]
 
         # the timing data must be deepcopied, though;
@@ -94,8 +92,8 @@ class AnimationPlayer(Utilities):
         ## create a mapping with animation nodes
 
         self.node_map = {
-          node_name : Node(node_name, node_data)
-          for node_name, node_data in self.nodes_data.items()
+            node_name: Node(node_name, node_data)
+            for node_name, node_data in self.nodes_data.items()
         }
 
         ## create a set of animation names
@@ -112,16 +110,14 @@ class AnimationPlayer(Utilities):
 
         # pick either "idle", or the first one from a
         # tuple with the animation names
-        anim_name = "idle" if "idle" in self.anim_names \
-                           else (*self.anim_names,)[0]
+        anim_name = "idle" if "idle" in self.anim_names else (*self.anim_names,)[0]
 
         # then switch to the chosen animation
         self.switch_animation(anim_name)
 
         ### position game_obj
 
-        setattr(self.game_obj.rect,
-                coordinates_name, coordinates_value)
+        setattr(self.game_obj.rect, coordinates_name, coordinates_value)
 
     ### animation switching support
 
@@ -129,7 +125,7 @@ class AnimationPlayer(Utilities):
         """Switch current animation to requested one.
 
         Also return True if succeed.
-        
+
         animation_name (string)
             represents the name of an animation.
 
@@ -142,14 +138,16 @@ class AnimationPlayer(Utilities):
         ### those are already pre-checked in the animation
         ### data processing, we do a very simplified checkup
         ### here for the sake of efficiency)
-        try: self.structure[animation_name]
+        try:
+            self.structure[animation_name]
 
         ### if absent, then deem the data to play the
         ### animation insufficient
         except KeyError:
             print(
-              "Didn't manage to find enough data to play",
-              "the animation called", animation_name
+                "Didn't manage to find enough data to play",
+                "the animation called",
+                animation_name,
             )
 
         ### otherwise, perform the needed setups to leave
@@ -202,13 +200,12 @@ class AnimationPlayer(Utilities):
         for node_name in timing_data:
             node_timing = timing_data[node_name]
 
-            for key in \
-            ("surface_indices", "position_indices"):
+            for key in ("surface_indices", "position_indices"):
                 node_timing[key].restore_walking()
 
     def set_root_and_structure(self):
         """Setup root node and animation structure.
-        
+
         In this method we perform three important operations
         related to the animation structure:
 
@@ -227,7 +224,7 @@ class AnimationPlayer(Utilities):
         Below you find more details about operation (1) and
         (2). There was no need to further comment the
         operation (3).
-        
+
         About operation (1):
 
         The game object references one of the root rects
@@ -267,7 +264,8 @@ class AnimationPlayer(Utilities):
         root_rect = new_root.col_rect or new_root.rect
 
         ## try retrieving previous root (if any)
-        try: previous_root = self.root
+        try:
+            previous_root = self.root
 
         ## if there weren't one, just assign the root rect
         ## to the game obj rect attribute
@@ -280,8 +278,7 @@ class AnimationPlayer(Utilities):
         else:
 
             if new_root is not previous_root:
-                self.exchange_root_position(
-                                  previous_root, new_root)
+                self.exchange_root_position(previous_root, new_root)
 
                 # also assign the root rect to the game obj
                 # rect attribute
@@ -310,12 +307,10 @@ class AnimationPlayer(Utilities):
         ### store updating order, drawing order and
         ### node_names list
 
-        for key in \
-        ("updating_order", "drawing_order", "node_names"):
+        for key in ("updating_order", "drawing_order", "node_names"):
             setattr(self, key, anim_structure[key])
 
-    def exchange_root_position(
-        self, previous_root, new_root):
+    def exchange_root_position(self, previous_root, new_root):
         """Exchange position from previous to new root.
 
         previous_root, new_root
@@ -330,8 +325,7 @@ class AnimationPlayer(Utilities):
         ### retrieve pygame.Rect attribute names used to
         ### exchange the position data
 
-        attribute_names = \
-            exchange_map[previous_root.name][new_root.name]
+        attribute_names = exchange_map[previous_root.name][new_root.name]
 
         prev_attr_name, new_attr_name = attribute_names
 
@@ -340,8 +334,7 @@ class AnimationPlayer(Utilities):
 
         new_rect = new_root.col_rect or new_root.rect
 
-        prev_rect = \
-            previous_root.col_rect or  previous_root.rect
+        prev_rect = previous_root.col_rect or previous_root.rect
 
         ### finally, retrieve the position value from
         ### previous root rect and apply to new root rect
@@ -366,10 +359,12 @@ class AnimationPlayer(Utilities):
         node = self.node_map[tree["name"]]
 
         ### check if it has children
-        try: children = tree["children"]
+        try:
+            children = tree["children"]
 
         ### if not just pass
-        except KeyError: pass
+        except KeyError:
+            pass
 
         ### otherwise, iterate over each child data
         ### mapping stored in the children list,
@@ -410,12 +405,11 @@ class AnimationPlayer(Utilities):
         ### from the data, retrieve the name of the node
         ### and sequence from which to retrieve the
         ### animation clock
-        node_name     = data["node_name"]
+        node_name = data["node_name"]
         sequence_name = data["sequence_name"]
 
         ### finally retrieve and store the animation clock
-        self.anim_clock = \
-        self.timing[self.anim_name][node_name][sequence_name]
+        self.anim_clock = self.timing[self.anim_name][node_name][sequence_name]
 
     ### update routines
 
@@ -427,7 +421,7 @@ class AnimationPlayer(Utilities):
         which are them assigned/passed to the nodes via
         the image attribute for surfaces and the set_pos
         method for positions.
-        
+
         steps (int, defaults to 0)
             How much to rotate the data. steps=0
             means no rotation. rotate < 0 means rotate forth
@@ -460,10 +454,8 @@ class AnimationPlayer(Utilities):
             ### retrieve values and timing for the named node
             ### in the current animation
 
-            node_values = \
-                    self.values[self.anim_name][node_name]
-            node_timing = \
-                    self.timing[self.anim_name][node_name]
+            node_values = self.values[self.anim_name][node_name]
+            node_timing = self.timing[self.anim_name][node_name]
 
             ### rotate the time indices
 
@@ -477,7 +469,7 @@ class AnimationPlayer(Utilities):
             pos_index = node_timing["position_indices"][0]
 
             ### finally, using the indices just retrieved,
-            ### store current surface reference and set 
+            ### store current surface reference and set
             ### position of the node
 
             ## reference node
@@ -489,11 +481,11 @@ class AnimationPlayer(Utilities):
             ## set position using related method
             node.set_pos(node_values["positions"][pos_index])
 
-    step_forth      = partialmethod(update_nodes,  1)
-    two_steps_forth = partialmethod(update_nodes,  2)
+    step_forth = partialmethod(update_nodes, 1)
+    two_steps_forth = partialmethod(update_nodes, 2)
 
-    step_back       = partialmethod(update_nodes, -1)
-    two_steps_back  = partialmethod(update_nodes, -2)
+    step_back = partialmethod(update_nodes, -1)
+    two_steps_back = partialmethod(update_nodes, -2)
 
     ### drawing routines
 
@@ -504,26 +496,25 @@ class AnimationPlayer(Utilities):
 
     def draw_nodes(self):
         """Draw each node."""
-        for node in \
-        map(self.node_map.__getitem__, self.drawing_order):
+        for node in map(self.node_map.__getitem__, self.drawing_order):
             node.draw()
 
     def draw_nodes_and_bounding_rect(self):
         """Draw each node and its rects."""
-        for node in \
-        map(self.node_map.__getitem__, self.drawing_order):
+        for node in map(self.node_map.__getitem__, self.drawing_order):
 
             node.draw()
             draw_rect(SCREEN, ORANGE, node.rect, 2)
 
     def draw_nodes_and_col_rect(self):
         """Draw each node and its collision rect, if any."""
-        for node in \
-        map(self.node_map.__getitem__, self.drawing_order):
+        for node in map(self.node_map.__getitem__, self.drawing_order):
 
             node.draw()
 
-            try: draw_rect(SCREEN, RED, node.col_rect, 2)
+            try:
+                draw_rect(SCREEN, RED, node.col_rect, 2)
 
             # node.col_rect is None instead of Rect
-            except TypeError: pass
+            except TypeError:
+                pass

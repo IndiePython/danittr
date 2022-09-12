@@ -2,7 +2,7 @@
 
 from os import environ
 
-from types   import SimpleNamespace
+from types import SimpleNamespace
 from pathlib import Path
 
 ### third-party imports
@@ -10,8 +10,8 @@ from pathlib import Path
 from pygame import USEREVENT
 
 from pygame.display import set_mode, set_icon, set_caption
-from pygame.image   import load as load_image
-from pygame.time    import Clock
+from pygame.image import load as load_image
+from pygame.time import Clock
 
 ### local imports
 
@@ -23,21 +23,19 @@ from .keymapping import DEFAULT_KEYS_MAP
 
 ### locations
 
-data_dir = Path(__file__).parent / 'data'
+data_dir = Path(__file__).parent / "data"
 
-MUSIC_DIR      = str(data_dir / "music")
-LEVELS_DIR     = str(data_dir / "levels")
-SOUNDS_DIR     = str(data_dir / "sounds")
-SCENES_DIR     = str(data_dir / "scenes")
+MUSIC_DIR = str(data_dir / "music")
+LEVELS_DIR = str(data_dir / "levels")
+SOUNDS_DIR = str(data_dir / "sounds")
+SCENES_DIR = str(data_dir / "scenes")
 ANIMATIONS_DIR = str(data_dir / "animations")
 
-IMAGES_DIR       = str(data_dir / "images")
-IMAGES_META_FILE = \
-    str(data_dir / "images_meta_file.json")
+IMAGES_DIR = str(data_dir / "images")
+IMAGES_META_FILE = str(data_dir / "images_meta_file.json")
 
-FONTS_DIR       = str(data_dir / "fonts")
-FONTS_META_FILE = \
-    str(data_dir / "fonts_meta_file.json")
+FONTS_DIR = str(data_dir / "fonts")
+FONTS_META_FILE = str(data_dir / "fonts_meta_file.json")
 
 ### defining path to config file
 
@@ -51,7 +49,7 @@ else:
     config_dir = Path(environ["HOME"]) / ".config"
 
 
-APP_CONFIG_DIR = config_dir / 'danittr'
+APP_CONFIG_DIR = config_dir / "danittr"
 
 if not APP_CONFIG_DIR.exists():
     APP_CONFIG_DIR.mkdir(parents=True)
@@ -76,20 +74,20 @@ GAME_REFS = SimpleNamespace()
 CLOCK = Clock()
 
 FPS = 30
-MILLISECS_PER_FRAME = (1/FPS) * 1000
+MILLISECS_PER_FRAME = (1 / FPS) * 1000
 
 ### Custom events
 
 SWITCH_LEVEL_TRIGGER = USEREVENT + 1
-RESTART_FROM_SAVE    = USEREVENT + 2
+RESTART_FROM_SAVE = USEREVENT + 2
 
 ### Other data
 
 STATE_FILE_NAME = "state.stt"
 DEFAULT_STATE_DATA = {
-  "last_level"           : "level01.lvl",
-  "last_played_datetime" : None,
-  "health" :               100
+    "last_level": "level01.lvl",
+    "last_played_datetime": None,
+    "health": 100,
 }
 
 ### Custom settings
@@ -97,13 +95,14 @@ DEFAULT_STATE_DATA = {
 CONFIG_FILE = str(APP_CONFIG_DIR / "config.json")
 
 DEFAULT_SETTINGS = {
-  "music_volume" : 0.2,
-  "sound_volume" : 0.2,
-  "keys_map"     : DEFAULT_KEYS_MAP
+    "music_volume": 0.2,
+    "sound_volume": 0.2,
+    "keys_map": DEFAULT_KEYS_MAP,
 }
 
 
-try: USER_SETTINGS = load_json(CONFIG_FILE) 
+try:
+    USER_SETTINGS = load_json(CONFIG_FILE)
 except Exception as err:
     print(str(err))
     USER_SETTINGS = DEFAULT_SETTINGS
@@ -125,8 +124,8 @@ set_icon(ICON)
 
 ### Defining constants and performing screen setup (set_mode)
 SCREEN_WIDTH, SCREEN_HEIGHT = 1280, 720
-FLAG                        = 0
-DEPTH                       = 32
+FLAG = 0
+DEPTH = 32
 
 SCREEN = set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), FLAG, DEPTH)
 

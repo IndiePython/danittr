@@ -32,14 +32,15 @@ seed()
 
 CHAR_DATA_MAP = {}
 
-COMMON_CHARS = ascii_letters + digits + punctuation + " " \
-               + "áàãâêéèẽîíìôóòõûúùñç"
+COMMON_CHARS = ascii_letters + digits + punctuation + " " + "áàãâêéèẽîíìôóòõûúùñç"
 
 ##### utility functions
 
+
 def safe_text_render(char, render_kwargs):
     """Render char with extra except clause for safety."""
-    try: return render_text(char, padding=0, **render_kwargs)
+    try:
+        return render_text(char, padding=0, **render_kwargs)
 
     ### errors raised by pygame.font.Font.render:
     ### some values aren't accepted in pygame (they are
@@ -51,7 +52,8 @@ def safe_text_render(char, render_kwargs):
     ### caused this, maybe it's the only one?);
     ### those problems vary depending on the font; such
     ### errors where actually found in another codebase;
-    except (ValueError, pygame_error): pass
+    except (ValueError, pygame_error):
+        pass
 
 
 # XXX consider a better name for this function; it is
@@ -67,7 +69,7 @@ def create_char_maps(render_kwargs, args_key):
     ### with width of corresponding surfaces is also
     ### created;
 
-    surf_map  = {}
+    surf_map = {}
     width_map = {}
 
     for char in COMMON_CHARS:
@@ -82,7 +84,7 @@ def create_char_maps(render_kwargs, args_key):
                 surf = safe_text_render(char, render_kwargs)
 
                 width_map[char] = surf.get_width()
-                surf_map[char]  = surf
+                surf_map[char] = surf
 
             ## if the surf wasn't generated, then the surf
             ## is None and will trigger an attribute error
@@ -96,11 +98,11 @@ def create_char_maps(render_kwargs, args_key):
     ### store maps and valid char codes list in the
     ### CHAR_DATA_MAP, referenced by the json configuration
     ### string
-    CHAR_DATA_MAP[args_key] = (
-      surf_map, width_map, valid_codes
-    )
+    CHAR_DATA_MAP[args_key] = (surf_map, width_map, valid_codes)
+
 
 ### class definition
+
 
 class Label(BasicObject):
     """A text widget with automatic surface updating.
@@ -110,13 +112,16 @@ class Label(BasicObject):
     """
 
     def __init__(
-        self, text="",
+        self,
+        text="",
         *,
-        font_size=22, font_style="default",
+        font_size=22,
+        font_style="default",
         foreground_color=BLACK,
         background_color=(*BLACK, 0),
         coordinates_name="topleft",
-        coordinates_value=(0, 0)):
+        coordinates_value=(0, 0)
+    ):
         """Perform setups and assign data for reuse.
 
         text
@@ -168,9 +173,9 @@ class Label(BasicObject):
         ## render characters
 
         self.render_kwargs = {
-          "font_size"        : font_size,
-          "font_style"       : font_style,
-          "foreground_color" : foreground_color
+            "font_size": font_size,
+            "font_style": font_style,
+            "foreground_color": foreground_color,
         }
 
         ## a tuple with the arguments is also created
@@ -179,8 +184,7 @@ class Label(BasicObject):
         ## related to each different setting will never
         ## be generated more than once
 
-        args_key = \
-                (font_size, font_style, foreground_color)
+        args_key = (font_size, font_style, foreground_color)
 
         ## the CHAR_DATA_MAP holds all the data needed to
         ## manage labels, for each different combination
@@ -193,26 +197,23 @@ class Label(BasicObject):
 
         ## finally, we retrieve and assign the data we need
         ## from the CHAR_DATA_MAP using the key
-        self.surf_map, self.width_map, self.valid_codes \
-                                = CHAR_DATA_MAP[args_key]
+        self.surf_map, self.width_map, self.valid_codes = CHAR_DATA_MAP[args_key]
 
         # TODO this step of storing the height shouldn't be
         # repeated every time an instance is created
         # (probably include it on the if block above)
         ### store the height of a random character
-        self.height = \
-            choice(list(self.surf_map.values())).get_height()
+        self.height = choice(list(self.surf_map.values())).get_height()
 
         ### create and position rect
 
         self.rect = Rect((0, 0), (0, self.height))
 
-        setattr(self.rect,
-                coordinates_name, coordinates_value)
+        setattr(self.rect, coordinates_name, coordinates_value)
 
         ### also store the coordinate information
 
-        self.coordinates_name  = coordinates_name
+        self.coordinates_name = coordinates_name
         self.coordinates_value = coordinates_value
 
         ### create an attribute with a string to store the
@@ -238,7 +239,8 @@ class Label(BasicObject):
             value to be used as label text.
         """
         ### return earlier if text is already set
-        if text == self.contents: return
+        if text == self.contents:
+            return
 
         ### otherwise "clear" contents and add text
 
@@ -252,9 +254,7 @@ class Label(BasicObject):
             Any string obj.
         """
         ### only keep valid characters (present on map)
-        filtered_text = \
-            "".join(list(
-                    filter(self.filter_char, text)))
+        filtered_text = "".join(list(filter(self.filter_char, text)))
 
         ### extend content with filtered text
         self.contents += filtered_text
@@ -263,15 +263,15 @@ class Label(BasicObject):
         self.update_image()
 
     def filter_char(self, char):
-        """Return True if a surf is available for char.
-        """
+        """Return True if a surf is available for char."""
         ### only proceed if code for char is valid
         ### (present on font)
         if ord(char) in self.valid_codes:
 
             ## if a surface was already generated for the
             ## char, them return True
-            if char in self.surf_map: return True
+            if char in self.surf_map:
+                return True
 
             ## otherwise generate said surf and populate it
             ## the respective values in the surf map and
@@ -281,11 +281,10 @@ class Label(BasicObject):
                 # try generating surf and populating the
                 # maps
                 try:
-                    surf = safe_text_render(
-                               char, self.render_kwargs)
+                    surf = safe_text_render(char, self.render_kwargs)
 
                     self.width_map[char] = surf.get_width()
-                    self.surf_map[char]  = surf
+                    self.surf_map[char] = surf
                     return True
 
                 # if the surf wasn't generated, then the
@@ -296,7 +295,7 @@ class Label(BasicObject):
                 # removed from the valid codes list
                 except AttributeError:
                     self.valid_codes.remove(ord(char))
-                
+
     def update_image(self):
         """Update image surface attribute."""
         ### create new surface for image attribute
@@ -333,6 +332,4 @@ class Label(BasicObject):
 
         self.rect.size = self.image.get_size()
 
-        setattr(
-          self.rect,
-          self.coordinates_name, self.coordinates_value)
+        setattr(self.rect, self.coordinates_name, self.coordinates_value)

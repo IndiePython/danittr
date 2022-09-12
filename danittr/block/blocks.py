@@ -10,14 +10,11 @@ class StaticBlock(BasicObject):
 
     level = None
     prop_map = {
-        "stone_block" : \
-            render_image("stone_block.png"),
-        "dirt_block01" : \
-            render_image("dirt_block01.png"),
-        "sand_block" : \
-            render_image("sand_block.png")
+        "stone_block": render_image("stone_block.png"),
+        "dirt_block01": render_image("dirt_block01.png"),
+        "sand_block": render_image("sand_block.png"),
     }
-    
+
     def __init__(self, prop_name, coordinates):
         """Assign variables.
 
@@ -26,12 +23,12 @@ class StaticBlock(BasicObject):
         coordinates
             bottomleft coordinates for the rect attribute.
         """
-        self.prop_name = prop_name 
-        
+        self.prop_name = prop_name
+
         self.image = StaticBlock.prop_map[prop_name]
-        
+
         self.rect = self.image.get_rect()
-        
+
         self.rect.bottomleft = coordinates
 
         self.update = empty_function

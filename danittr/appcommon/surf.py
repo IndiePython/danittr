@@ -7,8 +7,8 @@ from os.path import join
 
 ### third-party imports
 
-from pygame         import Surface
-from pygame.image   import load as load_image
+from pygame import Surface
+from pygame.image import load as load_image
 from pygame.display import update
 
 ### local imports
@@ -29,9 +29,10 @@ IMAGE_NAME_TO_ALPHA_MAP = load_json(IMAGES_META_FILE)
 
 ### functions for general usage
 
+
 def render_image(
-    img_name, return_obj=False,
-    coordinates_name="topleft", coordinates_value=(0, 0)):
+    img_name, return_obj=False, coordinates_name="topleft", coordinates_value=(0, 0)
+):
     """Return a surface or object representing an image.
 
     img_name (string)
@@ -50,7 +51,8 @@ def render_image(
         A 2-tuple of integers representing a point to be
         assigned to one of the rects coordinates.
     """
-    try: surf = IMAGES_MAP[img_name]
+    try:
+        surf = IMAGES_MAP[img_name]
 
     except KeyError:
 
@@ -63,7 +65,8 @@ def render_image(
         if IMAGE_NAME_TO_ALPHA_MAP[img_name]:
             surf_method = Surface.convert_alpha
 
-        else: surf_method = Surface.convert
+        else:
+            surf_method = Surface.convert
 
         surf = surf_method(load_image(img_path))
 
@@ -78,20 +81,25 @@ def render_image(
 
         obj = BasicObject()
         obj.image = surf
-        obj.rect  = obj.image.get_rect()
+        obj.rect = obj.image.get_rect()
 
         ## position its rect
-        setattr(obj.rect,
-                coordinates_name, coordinates_value)
+        setattr(obj.rect, coordinates_name, coordinates_value)
 
         return obj
 
-    else: return surf
+    else:
+        return surf
+
 
 def render_rect(
-    width, height, color=BLACK,
+    width,
+    height,
+    color=BLACK,
     return_obj=False,
-    coordinates_name="topleft", coordinates_value=(0, 0)):
+    coordinates_name="topleft",
+    coordinates_value=(0, 0),
+):
     """Return surface or object representing a filled rect.
 
     width
@@ -123,14 +131,17 @@ def render_rect(
     """
     ### instantiate surface taking transparency into account
 
-    try: has_transparency = color[3] < 255
-    except IndexError: has_transparency = False
+    try:
+        has_transparency = color[3] < 255
+    except IndexError:
+        has_transparency = False
     finally:
 
         if has_transparency:
             surf = Surface((width, height)).convert_alpha()
 
-        else: surf = Surface((width, height)).convert()
+        else:
+            surf = Surface((width, height)).convert()
 
     surf.fill(color)
 
@@ -143,22 +154,21 @@ def render_rect(
 
         obj = BasicObject()
         obj.image = surf
-        obj.rect  = obj.image.get_rect()
+        obj.rect = obj.image.get_rect()
 
         ## position its rect
-        setattr(obj.rect,
-                coordinates_name, coordinates_value)
+        setattr(obj.rect, coordinates_name, coordinates_value)
 
         return obj
 
-    else: return surf
+    else:
+        return surf
 
 
 # XXX maybe raise a ValueError if at least one dimension
 # of the original surf is larger than the required
 # dimensions? Ponder.
-def enlarge_surf(
-    surf, width, height, background_color=(*BLACK, 0)):
+def enlarge_surf(surf, width, height, background_color=(*BLACK, 0)):
     """Blit current surf on bigger one to enlarge it.
 
     width
@@ -177,23 +187,26 @@ def enlarge_surf(
     ## alias background color
     bg_color = background_color
 
-    try: has_transparency = bg_color[3] < 255
+    try:
+        has_transparency = bg_color[3] < 255
 
-    except IndexError: has_transparency = False
+    except IndexError:
+        has_transparency = False
 
     finally:
 
         if has_transparency:
-            bg_surf = Surface(
-                           (width, height)).convert_alpha()
+            bg_surf = Surface((width, height)).convert_alpha()
 
-        else: bg_surf = Surface((width, height)).convert()
+        else:
+            bg_surf = Surface((width, height)).convert()
 
     bg_surf.fill(bg_color)
 
     bg_surf.blit(surf, (0, 0))
 
     return bg_surf
+
 
 ## XXX
 ## About using colorkey:

@@ -1,45 +1,49 @@
 """Facility for loading game on main menu."""
 
-from os        import listdir
-from types     import SimpleNamespace
-from os.path   import join
+from os import listdir
+from types import SimpleNamespace
+from os.path import join
 from functools import partialmethod
 
 ### third-party imports
 
 from pygame import (
-                   QUIT,
-                   KEYDOWN, K_RETURN, K_ESCAPE,
-                   K_w, K_UP, K_s, K_DOWN,
-                   MOUSEBUTTONDOWN, MOUSEMOTION)
+    QUIT,
+    KEYDOWN,
+    K_RETURN,
+    K_ESCAPE,
+    K_w,
+    K_UP,
+    K_s,
+    K_DOWN,
+    MOUSEBUTTONDOWN,
+    MOUSEMOTION,
+)
 
 from pygame.display import update
-from pygame.event   import get     as get_events
-from pygame.image   import load    as load_image
-from pygame.draw    import rect    as draw_rect
-from pygame.mouse   import get_pos as get_mouse_pos
+from pygame.event import get as get_events
+from pygame.image import load as load_image
+from pygame.draw import rect as draw_rect
+from pygame.mouse import get_pos as get_mouse_pos
 
 ### local imports
 
-from ..config import (
-                   SCREEN, SCREEN_RECT,
-                   GAME_REFS, SAVES_DIR, STATE_FILE_NAME)
+from ..config import SCREEN, SCREEN_RECT, GAME_REFS, SAVES_DIR, STATE_FILE_NAME
 
 from ..common.math import get_reaching_multiple
 from ..common.behaviour import empty_function
 from ..common.jsonhandler import load_json
 from ..common.wdeque.main import WalkingDeque
 
-from ..appcommon.task import (
-                                     add_task,
-                                     update_task_manager)
+from ..appcommon.task import add_task, update_task_manager
 from ..appcommon.surf import render_rect
 from ..appcommon.style import give_depth_finish
 from ..appcommon.autoblit import BlitterSet
 from ..appcommon.exception import (
-                                     QuitGameException,
-                                     LevelSwitchException,
-                                     ManagerSwitchException)
+    QuitGameException,
+    LevelSwitchException,
+    ManagerSwitchException,
+)
 from ..appcommon.text.main import render_text
 from ..appcommon.behaviour.load import load_game
 
@@ -66,19 +70,15 @@ class LoadGameWidget(object):
         """
         self.main_menu = main_menu
 
-        self.thumb = render_rect(
-                           640, 360, return_obj=True,
-                           coordinates_value=(630, 25))
+        self.thumb = render_rect(640, 360, return_obj=True, coordinates_value=(630, 25))
 
         self.build_slot_list()
 
-        self.background = \
-              render_rect(*SCREEN_RECT.size, color=SKY_COLOR)
+        self.background = render_rect(*SCREEN_RECT.size, color=SKY_COLOR)
 
         self.set_labels()
 
-        self.error_cooldown_task = SimpleNamespace(
-                                                finished=True)
+        self.error_cooldown_task = SimpleNamespace(finished=True)
 
     def set_labels(self):
         """Set a labels group to display labels."""
@@ -86,19 +86,25 @@ class LoadGameWidget(object):
 
         font_size = 28
 
-        text01  = "Please,"
-        label01 = render_text(text01, font_size,
-                              foreground_color=WHITE,
-                              padding=0,
-                              return_obj=True,
-                              coordinates_value=(25, 25))
+        text01 = "Please,"
+        label01 = render_text(
+            text01,
+            font_size,
+            foreground_color=WHITE,
+            padding=0,
+            return_obj=True,
+            coordinates_value=(25, 25),
+        )
 
-        text02  = "select a save:"
-        label02 = render_text(text02, font_size,
-                              foreground_color=WHITE,
-                              padding=0,
-                              return_obj=True,
-                              coordinates_value=(25, 60))
+        text02 = "select a save:"
+        label02 = render_text(
+            text02,
+            font_size,
+            foreground_color=WHITE,
+            padding=0,
+            return_obj=True,
+            coordinates_value=(25, 60),
+        )
 
         self.labels.update([label01, label02])
 
@@ -107,12 +113,9 @@ class LoadGameWidget(object):
         ### Collect saves information
         saves = []
         for dirname in listdir(SAVES_DIR):
-            path        = join(SAVES_DIR, dirname,
-                               STATE_FILE_NAME)
-            last_played = load_json(path)[
-                                       "last_played_datetime"]
-            save = SimpleNamespace(dirname=dirname,
-                                   last_played=last_played)
+            path = join(SAVES_DIR, dirname, STATE_FILE_NAME)
+            last_played = load_json(path)["last_played_datetime"]
+            save = SimpleNamespace(dirname=dirname, last_played=last_played)
             saves.append(save)
 
         ### Sort by last played, generate visual slots
@@ -120,25 +123,25 @@ class LoadGameWidget(object):
         def get_last_played(item):
             """Return last played attribute value."""
             return item.last_played
+
         saves.sort(key=get_last_played, reverse=True)
 
         x, y = 200, 25
         slots = []
         for save in saves:
             topleft = (x, y)
-            slot    = SaveSlot(save.dirname, save.last_played,
-                               topleft)
+            slot = SaveSlot(save.dirname, save.last_played, topleft)
             slots.append(slot)
             y += SLOT_DISTANCE
 
         ### Create groups of such slots to help manage them
         self.slots_deque = WalkingDeque(slots)
-        self.slots       = BlitterSet(self.slots_deque)
+        self.slots = BlitterSet(self.slots_deque)
 
         ### Define choosen one and rect to highlight it
-        self.selected_slot  = self.slots_deque[0]
+        self.selected_slot = self.slots_deque[0]
         self.highlight_rect = self.selected_slot.rect
-        self.thumb.image    = self.selected_slot.thumb
+        self.thumb.image = self.selected_slot.thumb
 
     def control(self):
         """Update widget state based on event_queue."""
@@ -158,8 +161,7 @@ class LoadGameWidget(object):
                 elif event.key == K_RETURN:
                     self.load_game_from_slot()
                 elif event.key == K_ESCAPE:
-                    raise ManagerSwitchException(
-                                            self.main_menu)
+                    raise ManagerSwitchException(self.main_menu)
 
             ### Mouse
             elif event.type == MOUSEMOTION:
@@ -188,7 +190,7 @@ class LoadGameWidget(object):
 
         SCREEN.blit(self.thumb.image, self.thumb.rect)
         update()
-    
+
     def rotate_selection(self, amount=0, from_mouse=False):
         """Assign selected item after rotating by amount.
 
@@ -200,16 +202,17 @@ class LoadGameWidget(object):
             the scrolling itself with the mouse wheel.
         """
         self.slots_deque.walk(amount)
-        self.selected_slot  = self.slots_deque[0]
+        self.selected_slot = self.slots_deque[0]
         self.highlight_rect = self.selected_slot.rect
-        self.thumb.image    = self.selected_slot.thumb
+        self.thumb.image = self.selected_slot.thumb
 
-        if not from_mouse: self.check_scrolling()
+        if not from_mouse:
+            self.check_scrolling()
 
         SOUNDS_MAP["gui_step"].play()
 
     select_previous = partialmethod(rotate_selection, -1)
-    select_next     = partialmethod(rotate_selection,  1)
+    select_next = partialmethod(rotate_selection, 1)
 
     def mouse_motion_routine(self, mouse_position):
         """Check if mouse touches any widget and select it.
@@ -226,10 +229,12 @@ class LoadGameWidget(object):
                 touched_item = item
                 break
 
-        else: touched_item = None
+        else:
+            touched_item = None
 
         ### If already selected, get out
-        if touched_item == self.selected_slot: return
+        if touched_item == self.selected_slot:
+            return
 
         ### Select slot + admin tasks
 
@@ -257,7 +262,8 @@ class LoadGameWidget(object):
                 touched_item = item
                 break
 
-        else: touched_item = None
+        else:
+            touched_item = None
 
         ### Select slot if not already + load slot
 
@@ -296,44 +302,42 @@ class LoadGameWidget(object):
                 return
 
         ### Otherwise, scroll and check if mouse hovers any
-        for slot in self.slots: slot.rect.y += amount
+        for slot in self.slots:
+            slot.rect.y += amount
 
         self.mouse_motion_routine(get_mouse_pos())
 
-    scroll_up   = partialmethod(scroll, -SLOT_DISTANCE)
-    scroll_down = partialmethod(scroll,  SLOT_DISTANCE)
+    scroll_up = partialmethod(scroll, -SLOT_DISTANCE)
+    scroll_down = partialmethod(scroll, SLOT_DISTANCE)
 
     def play_error(self):
         """Time and execute play error appropriately."""
         if self.error_cooldown_task.finished:
             SOUNDS_MAP["error"].play()
-            self.error_cooldown_task = add_task(
-                                         empty_function, 800)
+            self.error_cooldown_task = add_task(empty_function, 800)
 
     def check_scrolling(self):
         """Check if current slot needs to be scrolled.
-        
+
         This is to be sure the selected slot is aways
         on screen.
         """
         ### Store reusable values
-        slot_top      = self.selected_slot.rect.top
-        slot_bottom   = self.selected_slot.rect.bottom
-        screen_top    = SCREEN_RECT.top
+        slot_top = self.selected_slot.rect.top
+        slot_bottom = self.selected_slot.rect.bottom
+        screen_top = SCREEN_RECT.top
         screen_bottom = SCREEN_RECT.bottom
-    
+
         ### How much scrolling if slot is bellow screen
         if slot_top < screen_top:
             distance = screen_top - slot_top
-            to_scroll = get_reaching_multiple(SLOT_DISTANCE,
-                                              distance)
+            to_scroll = get_reaching_multiple(SLOT_DISTANCE, distance)
             self.scroll(to_scroll)
 
         ### How much scrolling if slot is above screen
         elif slot_bottom > screen_bottom:
             distance = slot_bottom - screen_bottom
-            to_scroll = get_reaching_multiple(SLOT_DISTANCE,
-                                              distance)
+            to_scroll = get_reaching_multiple(SLOT_DISTANCE, distance)
             self.scroll(-to_scroll)
 
     def load_game_from_slot(self):
@@ -360,13 +364,13 @@ class SaveSlot:
 
     def __init__(self, dirname, last_played, topleft):
         """Save slot."""
-        self.dirname     = dirname
-        self.save_name   = dirname.replace("save_", "", 1)
+        self.dirname = dirname
+        self.save_name = dirname.replace("save_", "", 1)
         self.last_played = last_played
 
-        surf              = render_rect(420, 80)
-        self.image        = give_depth_finish(surf)
-        self.rect         = self.image.get_rect()
+        surf = render_rect(420, 80)
+        self.image = give_depth_finish(surf)
+        self.rect = self.image.get_rect()
         self.rect.topleft = topleft
 
         self.blit_details()
@@ -375,23 +379,24 @@ class SaveSlot:
     def blit_details(self):
         """Blit the final details on the image surface."""
         save_name_text = "Name:  {}".format(self.save_name)
-        save_name_surf = \
-                render_text(save_name_text,
-                                   font_size=self.font_size,
-                                   foreground_color=WHITE,
-                                   background_color=BLACK,
-                                   padding=0)
+        save_name_surf = render_text(
+            save_name_text,
+            font_size=self.font_size,
+            foreground_color=WHITE,
+            background_color=BLACK,
+            padding=0,
+        )
 
-        last_played_text = \
-                 "Last played:  {}".format(self.last_played)
-        last_played_surf = \
-                render_text(last_played_text,
-                                   font_size=self.font_size,
-                                   foreground_color=WHITE,
-                                   background_color=BLACK,
-                                   padding=0)
+        last_played_text = "Last played:  {}".format(self.last_played)
+        last_played_surf = render_text(
+            last_played_text,
+            font_size=self.font_size,
+            foreground_color=WHITE,
+            background_color=BLACK,
+            padding=0,
+        )
 
-        self.image.blit(save_name_surf,   (5,  1))
+        self.image.blit(save_name_surf, (5, 1))
         self.image.blit(last_played_surf, (5, 35))
 
     def load_thumb(self):

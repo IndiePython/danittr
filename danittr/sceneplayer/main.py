@@ -7,26 +7,20 @@ from os.path import join
 from pygame import QUIT, KEYDOWN, K_SPACE
 
 from pygame.display import update
-from pygame.event   import get as get_events
-from pygame.time    import set_timer
+from pygame.event import get as get_events
+from pygame.time import set_timer
 
 ### local imports
 
-from ..config import (
-                   GAME_REFS, SCENES_DIR,
-                   SCREEN, SCREEN_RECT, SWITCH_LEVEL_TRIGGER)
+from ..config import GAME_REFS, SCENES_DIR, SCREEN, SCREEN_RECT, SWITCH_LEVEL_TRIGGER
 
 from ..common.jsonhandler import load_json
 
-from ..appcommon.task import (
-                                update_task_manager,
-                                clear_task_manager)
+from ..appcommon.task import update_task_manager, clear_task_manager
 from ..appcommon.surf import render_rect
 from ..appcommon.dialog import clear_messages
 from ..appcommon.autoblit import BlitterSet
-from ..appcommon.exception import (
-                                QuitGameException,
-                                ManagerSwitchException)
+from ..appcommon.exception import QuitGameException, ManagerSwitchException
 
 from ..appcommon.behaviour.switch import set_level_switching
 
@@ -43,7 +37,7 @@ logger = APP_LOGGER.getChild(__name__)
 
 class ScenePlayer:
     """An update manager which displays timed media.
-    
+
     This is a generic update manager for sections of the
     game which only require showing and hiding media in given
     intervals (for instance, logo screen, etc.).
@@ -72,11 +66,9 @@ class ScenePlayer:
 
         ### set background
 
-        background_color = \
-            self.scene_data.get("background_color", BLACK)
+        background_color = self.scene_data.get("background_color", BLACK)
 
-        self.background = \
-          render_rect(*SCREEN_RECT.size, background_color)
+        self.background = render_rect(*SCREEN_RECT.size, background_color)
 
         ### set objects
         self.set_objects()
@@ -97,8 +89,7 @@ class ScenePlayer:
             is_simple = obj_type.lower() == "simple"
 
             ### pick proper class according to condition
-            instantiator = \
-              SimpleObject if is_simple else AnimatedObject
+            instantiator = SimpleObject if is_simple else AnimatedObject
 
             ### retrieve keyword arguments
             kwargs = obj_data["kwargs"]
@@ -129,10 +120,9 @@ class ScenePlayer:
             if event["name"].lower() == "switch_level":
 
                 milliseconds = event["milliseconds"]
-                level_name   = event["level_name"]
+                level_name = event["level_name"]
 
-                set_level_switching(
-                    milliseconds, level_name)
+                set_level_switching(milliseconds, level_name)
 
     def control(self):
         """Update manager based on event_queue."""

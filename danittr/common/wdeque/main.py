@@ -1,14 +1,15 @@
 """Facility for custom deque class definition."""
 
 from collections import deque
-from functools   import partialmethod
-from copy        import deepcopy
+from functools import partialmethod
+from copy import deepcopy
 
 # XXX
 # replace the walking deque implementations in other
 # packages by this one, since it is much more advanced;
 
 ### main class definition
+
 
 class WalkingDeque(deque):
     """A deque with custom rotation and memory operations.
@@ -32,7 +33,7 @@ class WalkingDeque(deque):
 
         ### store length
         self.length = len(self)
-        
+
         ### raise value error if iterable is empty
         if not self.length:
             raise ValueError("iterable must not be empty")
@@ -43,7 +44,7 @@ class WalkingDeque(deque):
         ### signal);
 
         self.total_walking = 0
-        self.loops_no      = 0
+        self.loops_no = 0
 
     def walk(self, steps):
         """Perform custom rotation operation.
@@ -93,7 +94,7 @@ class WalkingDeque(deque):
         self.walk(original_index)
         value = self[0]
         self.walk(-original_index)
-        
+
         What will happen is that, if the index passed is
         out of range, it will return a value as if the
         deque kept rotating to compensate the missing
@@ -148,8 +149,7 @@ class WalkingDeque(deque):
         ### the total walking divided by the length
         return (index + self.total_walking) % self.length
 
-    get_index_of_first = partialmethod(
-                                   get_original_index, 0)
+    get_index_of_first = partialmethod(get_original_index, 0)
 
     def get_unwalked_list(self):
         """Return an unwalked list of the contents.
@@ -215,7 +215,8 @@ class WalkingDeque(deque):
 
         ### append the content view to the list in the views
         ### attribute
-        try: self.views.append(content_view)
+        try:
+            self.views.append(content_view)
 
         ### if such attribute doesn't exist, just store a new
         ### list in it and append the content view
@@ -228,7 +229,7 @@ class WalkingDeque(deque):
 
     def __setitem__(self, index, value):
         """Set new value and update views, if any.
-        
+
         Extends collections.deque.__setitem__
 
         index (integer)
@@ -245,10 +246,12 @@ class WalkingDeque(deque):
         super().__setitem__(index, value)
 
         ### try retrieving the views list
-        try: views = self.views
+        try:
+            views = self.views
 
         ### if no view exists, just pass
-        except AttributeError: pass
+        except AttributeError:
+            pass
 
         ### otherwise iterate views, updating them
         else:
@@ -284,16 +287,18 @@ class WalkingDeque(deque):
         memo[id(self)] = new_walking_deque
 
         ### try deepcopying content views
-        try: 
+        try:
             ## deepcopy each view;
             ## notice we don't need to catch a reference
             ## to the deepcopied views, since they are
             ## automatically stored in the views attribute
-            for view in self.views: deepcopy(view, memo)
+            for view in self.views:
+                deepcopy(view, memo)
 
         ### if an attribute error is raised, it means we
         ### have no content views, so we just pass
-        except AttributeError: pass
+        except AttributeError:
+            pass
 
         return new_walking_deque
 
@@ -304,25 +309,34 @@ class WalkingDeque(deque):
 
         Extends collections.deque.__repr__.
         """
-        return super().__repr__().replace(
-                                  'deque', 'WalkingDeque', 1)
+        return super().__repr__().replace("deque", "WalkingDeque", 1)
 
     ### behaviour for suppressed methods
 
     def _suppressed(self, *args, **kwargs):
         """Behaviour for suppressed operations (methods)."""
-        raise RuntimeError(
-                  "operation ruled out by the design")
+        raise RuntimeError("operation ruled out by the design")
 
     ## suppress all methods ruled out by the class design
     ## by overriding them with the _suppressed method
 
-    append = appendleft = extend = extendleft = \
-    pop = popleft = rotate = insert = clear = remove = \
-    reverse = __delitem__ = __delattr__ = _suppressed
+    append = (
+        appendleft
+    ) = (
+        extend
+    ) = (
+        extendleft
+    ) = (
+        pop
+    ) = (
+        popleft
+    ) = (
+        rotate
+    ) = insert = clear = remove = reverse = __delitem__ = __delattr__ = _suppressed
 
 
 ### subclass definition
+
 
 class ContentView(WalkingDeque):
     """View of walking deque content w/ autonomous walking.
@@ -349,7 +363,7 @@ class ContentView(WalkingDeque):
         original_index (integer)
             the existing original index of the item in the
             deque whose value you want to replace.
-        
+
         value (any python value/object)
             object/value to replace the current object/value
             stored in the original index.
@@ -389,7 +403,7 @@ class ContentView(WalkingDeque):
         ### retrieve value using the corresponding original
         ### index from the proxied deque
 
-        orig_index  = self.get_original_index(index)
+        orig_index = self.get_original_index(index)
         proxied_val = self.proxied.get_mem_value(orig_index)
 
         ### if the value retrieved is the same as the one
@@ -401,8 +415,7 @@ class ContentView(WalkingDeque):
         ### otherwise raise an error reporting the
         ### non-compliance of the value
         else:
-            raise ValueError(
-            "value must be identical to proxied deque value")
+            raise ValueError("value must be identical to proxied deque value")
 
     def get_content_view(self):
         """Return a "sibling" content view.
@@ -447,5 +460,4 @@ class ContentView(WalkingDeque):
 
         Extends WalkingDeque.__repr__.
         """
-        return super().__repr__().replace(
-                            'WalkingDeque', 'ContentView', 1)
+        return super().__repr__().replace("WalkingDeque", "ContentView", 1)

@@ -2,9 +2,9 @@
 
 ### standard library
 
-from types       import SimpleNamespace
-from operator    import attrgetter
-from itertools   import permutations
+from types import SimpleNamespace
+from operator import attrgetter
+from itertools import permutations
 from collections import defaultdict
 
 ### local imports
@@ -18,8 +18,8 @@ length_getter = attrgetter("length")
 
 ### functions
 
-def get_filled_map(
-    mapping, data, raw_data_key, post_process_key, func):
+
+def get_filled_map(mapping, data, raw_data_key, post_process_key, func):
     """Return mapping after filling it with processed data.
 
     mapping (dict)
@@ -38,7 +38,8 @@ def get_filled_map(
     for map_key in (raw_data_key, post_process_key):
 
         ### try retrieving raw data for processing
-        try: retrieved_map = data[map_key]
+        try:
+            retrieved_map = data[map_key]
 
         ### if absent, just break out of the for loop
         ### since the existence of both maps is
@@ -46,7 +47,8 @@ def get_filled_map(
         ### presence of the next one unnecessary (if there's
         ### no data to process, then having post-process
         ### instructions has no meaning);
-        except KeyError: break
+        except KeyError:
+            break
 
         ### otherwise, process raw data
         else:
@@ -68,9 +70,10 @@ def get_filled_map(
 
     return mapping
 
+
 def manage_proxy_animations(
-    metadata, structure, values, timing,
-    surf_map, pos_map, timing_map):
+    metadata, structure, values, timing, surf_map, pos_map, timing_map
+):
     """Setup proxy animations and related metadata.
 
     metadata (dict)
@@ -122,7 +125,7 @@ def manage_proxy_animations(
     ### values and timing to use when building the proxy
     ### animations
 
-    values_keys  = ("surface_data", "position_data")
+    values_keys = ("surface_data", "position_data")
     indices_keys = ("surface_indices", "position_indices")
 
     ### store a map which associates raw values keys to
@@ -130,18 +133,14 @@ def manage_proxy_animations(
 
     processed_values_keys = ("surfaces", "positions")
 
-    key_to_proc = dict(
-      zip(values_keys, processed_values_keys)
-    )
+    key_to_proc = dict(zip(values_keys, processed_values_keys))
 
     ### store map which associates values keys with their
     ### respective data map
 
     values_maps = (surf_map, pos_map)
 
-    key_to_map = dict(
-      zip(values_keys, values_maps)
-    )
+    key_to_map = dict(zip(values_keys, values_maps))
 
     ### iterate over proxy animations (if there are any)
     ### referencing animation data from other animations
@@ -155,10 +154,9 @@ def manage_proxy_animations(
 
         tree = structure[anim_name]["tree"]
 
-        refs_data = get_tree_values(
-                        tree, "reference_data", "children")
+        refs_data = get_tree_values(tree, "reference_data", "children")
 
-        ## iterate over each node and its respective 
+        ## iterate over each node and its respective
         ## referenced animation, creating references
         ## for animation values and timing
 
@@ -172,8 +170,7 @@ def manage_proxy_animations(
 
         # finally iterate
 
-        for node_name, ref_data in \
-        zip(node_names, refs_data):
+        for node_name, ref_data in zip(node_names, refs_data):
 
             # create mappings for node anim values and timing
 
@@ -195,19 +192,16 @@ def manage_proxy_animations(
                 # names of animation and node referenced
                 # respectively
 
-                if isinstance(values_ref_data, list) \
-                and len(values_ref_data) == 2:
+                if isinstance(values_ref_data, list) and len(values_ref_data) == 2:
 
                     # unpack values into names of the
                     # referenced animation and node
                     ref_anim, ref_node_name = values_ref_data
 
                     # retrieve values using those names
-                    retrieved_values = \
-                      get_nested_value(
-                        values, ref_anim, ref_node_name,
-                        proc_key)
-
+                    retrieved_values = get_nested_value(
+                        values, ref_anim, ref_node_name, proc_key
+                    )
 
                 # otherwise if the reference data is a
                 # string, then it is a key to retrieve the
@@ -220,13 +214,11 @@ def manage_proxy_animations(
 
                     # retrieve values using the reference
                     # data as key
-                    retrieved_values = values_map[
-                                            values_ref_data]
+                    retrieved_values = values_map[values_ref_data]
 
                 # finally assign the values to the proxy
                 # animation for the node in the proper key
-                proxy_values[node_name][proc_key] = \
-                                            retrieved_values
+                proxy_values[node_name][proc_key] = retrieved_values
 
             # assign timing "content content views"
             # (see common/wdeque/main.py for info on
@@ -242,19 +234,16 @@ def manage_proxy_animations(
                 # names of animation and node referenced
                 # respectively
 
-                if isinstance(timing_ref_data, list) \
-                and len(timing_ref_data) == 2:
+                if isinstance(timing_ref_data, list) and len(timing_ref_data) == 2:
 
                     # unpack values into names of the
                     # referenced animation and node
                     ref_anim, ref_node_name = timing_ref_data
 
                     # retrieve timing view using those names
-                    timing_view = \
-                      get_nested_value(
-                        timing, ref_anim, ref_node_name,
-                        key).get_content_view()
-
+                    timing_view = get_nested_value(
+                        timing, ref_anim, ref_node_name, key
+                    ).get_content_view()
 
                 # otherwise if the reference data is a
                 # string, then it is a key to retrieve the
@@ -264,12 +253,10 @@ def manage_proxy_animations(
 
                     # retrieve walking deque from timing
                     # map
-                    walking_deque = timing_map[
-                                           timing_ref_data]
+                    walking_deque = timing_map[timing_ref_data]
 
                     # retrieve the timing view
-                    timing_view = \
-                        walking_deque.get_content_view()
+                    timing_view = walking_deque.get_content_view()
 
                 # XXX add a function on sibling module
                 # checks.py to ensure there's never a
@@ -287,7 +274,7 @@ def store_anim_clock_keys(metadata, timing):
     timing
         Dictionary containing timing information about
         animations for each node.
-    
+
     For each animation, we measure the length of all
     timing sequences. The ones with the largest length
     for each animation have the node name and sequence
@@ -296,7 +283,7 @@ def store_anim_clock_keys(metadata, timing):
     Such 'sequence' is in fact an instance of
     a collections.deque subclass defined on
     common/wdeque/main.py module.
-    
+
     The largest one among them is called an animation clock,
     because we can use it to infer data like the
     current frame being played, how much frames it will
@@ -344,8 +331,9 @@ def store_anim_clock_keys(metadata, timing):
 
             for key in sequence_names:
                 if largest_deque == node_sequences_map[key]:
-                    anim_largest["node_name"]     = node_name
+                    anim_largest["node_name"] = node_name
                     anim_largest["sequence_name"] = key
+
 
 def store_root_pos_exchange_map(metadata, structure):
     """Generate/gather and store root position exchange map.
@@ -354,7 +342,7 @@ def store_root_pos_exchange_map(metadata, structure):
         Storage for animation metadata.
     structure (dict)
         Contains structure information for each animation.
-    
+
     A root position exchange map is a map which maps
     strings other dicts. Each string represents the name
     of a different root node in the animation (if the
@@ -382,10 +370,7 @@ def store_root_pos_exchange_map(metadata, structure):
     ### retrieve all root names and create pairs from the
     ### permutations between them
 
-    root_names = {
-      struct_data["tree"]["name"]
-      for struct_data in structure.values()
-    }
+    root_names = {struct_data["tree"]["name"] for struct_data in structure.values()}
 
     pairs = permutations(root_names, 2)
 
@@ -404,21 +389,22 @@ def store_root_pos_exchange_map(metadata, structure):
     ## find/assign the position
 
     for root_a, root_b in pairs:
-        root_pos_exchange_map[root_a][root_b] = \
-                                      ["center", "center"]
+        root_pos_exchange_map[root_a][root_b] = ["center", "center"]
 
     ### update root pos exchange map values using values
     ### provided by the user, if any
 
     ## try retrieving user provided data
-    try: root_pos_exchange_data = \
-                          metadata["root_pos_exchange_map"]
+    try:
+        root_pos_exchange_data = metadata["root_pos_exchange_map"]
 
     ## if not present, just pass
-    except KeyError: pass
+    except KeyError:
+        pass
 
     ## otherwise, update values in the existing map
-    else: root_pos_exchange_map.update(root_pos_exchange_data)
+    else:
+        root_pos_exchange_map.update(root_pos_exchange_data)
 
     ### finally store the exchange map in the metadata map
     metadata["root_pos_exchange_map"] = root_pos_exchange_map

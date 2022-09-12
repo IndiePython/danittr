@@ -1,15 +1,13 @@
 """Player class facility."""
 
-from types  import SimpleNamespace
+from types import SimpleNamespace
 from random import seed, choice
 
 # third-party imports
 from pygame.time import set_timer
 
 # local imports
-from ..config import (
-                   SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_RECT,
-                   RESTART_FROM_SAVE)
+from ..config import SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_RECT, RESTART_FROM_SAVE
 
 from ..logconfig import APP_LOGGER
 
@@ -38,50 +36,50 @@ logger = APP_LOGGER.getChild(__name__)
 class Player:
     """The main character in the game: Dani."""
 
-    def __init__(self, start_position, level, state_data,
-                 health=100):
+    def __init__(self, start_position, level, state_data, health=100):
         """Initialize superclass and variables."""
-        self.anim_player = \
-            AnimationPlayer(self, "dani",
-                            coordinates_name="bottomleft",
-                            coordinates_value=start_position)
+        self.anim_player = AnimationPlayer(
+            self,
+            "dani",
+            coordinates_name="bottomleft",
+            coordinates_value=start_position,
+        )
 
         self.anim_player.play()
 
-        self.level      = level
+        self.level = level
         self.state_data = state_data
-        self.health     = health
+        self.health = health
 
         self.set_operation_structure()
 
     def set_operation_structure(self):
         """Set other important operational structures.
-        
+
         Those include atributes, methods and other objects."""
         ### Instantiate assisting objects
 
-        self.equipped_display  = EquippedDisplay()
+        self.equipped_display = EquippedDisplay()
         self.inventory_manager = InventoryManager(
-                                     self.state_data,
-                                     self.equipped_display,
-                                     self)
+            self.state_data, self.equipped_display, self
+        )
 
-        self.healthbar   = HealthBar(self)
+        self.healthbar = HealthBar(self)
         self.player_head = Head()
 
         ## Send relevant ones to heads-up display
 
-        self.level.huds_group.update([self.healthbar,
-                                      self.player_head,
-                                      self.equipped_display])
+        self.level.huds_group.update(
+            [self.healthbar, self.player_head, self.equipped_display]
+        )
 
         ### Define variables for control
 
-        self.x_speed        =  0
-        self.x_accel        =  1
+        self.x_speed = 0
+        self.x_accel = 1
         self.max_walk_speed = 10
-        
-        self.y_speed       = 0
+
+        self.y_speed = 0
         self.gravity_accel = 2
 
         self.climb_speed = 5
@@ -93,48 +91,35 @@ class Player:
         ### Instantiate and setup additional managers
 
         self.dialogue_manager = DialogueManager(self)
-        self.prompt_manager   = PromptManager(self)
+        self.prompt_manager = PromptManager(self)
 
         ## Send additional managers to heads-up display
 
-        self.level.huds_group.update([self.dialogue_manager,
-                                      self.prompt_manager])
-
+        self.level.huds_group.update([self.dialogue_manager, self.prompt_manager])
 
         dialogue = [
-            { "player" : \
-                "Oh, my bag don't support" \
-                " more than six of each item."
-            }
+            {"player": "Oh, my bag don't support" " more than six of each item."}
         ]
 
-        self.full_inventory_dialogue = \
-                              dialoguebox_factory(dialogue)
+        self.full_inventory_dialogue = dialoguebox_factory(dialogue)
 
         ### Set sounds
 
         seed()
-        self.jump_sounds = [
-          SOUNDS_MAP["player_jump01"],
-          SOUNDS_MAP["player_jump02"]
-        ]
+        self.jump_sounds = [SOUNDS_MAP["player_jump01"], SOUNDS_MAP["player_jump02"]]
 
         ### Set movement routine (behaviour/physics)
 
-        self.default_physics = \
-                        CallList([self.move_x, self.move_y])
+        self.default_physics = CallList([self.move_x, self.move_y])
 
-        self.climb_physics   = CallList([
-                                   self.climb_x,
-                                   self.climb_y,
-                                   self.check_touching_ladder
-                               ])
+        self.climb_physics = CallList(
+            [self.climb_x, self.climb_y, self.check_touching_ladder]
+        )
 
         self.movement_routine = self.default_physics
 
         ### Set cooldown mechanisms
-        self.ladder_to_ground_cooldown = \
-                              SimpleNamespace(finished=True)
+        self.ladder_to_ground_cooldown = SimpleNamespace(finished=True)
 
         ### send actions to control overrider to be
         ### referenced when needed
@@ -156,7 +141,7 @@ class Player:
 
         self.check_handle_collision_x()
         self.check_block_collision_x()
-    
+
     def move_y(self):
         """Calculate and perform movement in y axis."""
         self.apply_gravity_pull()
@@ -167,24 +152,21 @@ class Player:
 
     def check_handle_collision_x(self):
         """Check for handle collision in x axis."""
-        collided_handle = \
-            self.level.horizontal_barriers.collide_any(self)
+        collided_handle = self.level.horizontal_barriers.collide_any(self)
 
         if collided_handle:
             self.warp_scroll_player(collided_handle)
 
     def check_handle_collision_y(self):
         """Check for handle collision in y axis."""
-        collided_handle = \
-            self.level.vertical_barriers.collide_any(self)
+        collided_handle = self.level.vertical_barriers.collide_any(self)
 
         if collided_handle:
             self.warp_scroll_player(collided_handle)
-        
+
     def check_block_collision_x(self):
         """Check for block collision in x axis."""
-        collided_platform = \
-            self.level.onscreen_map["blocks"].collide_any(self)
+        collided_platform = self.level.onscreen_map["blocks"].collide_any(self)
 
         if collided_platform:
             is_going_right = self.x_speed > 0
@@ -193,12 +175,11 @@ class Player:
             else:
                 self.rect.left = collided_platform.rect.right
             self.x_speed = 0
-        
+
     def check_block_collision_y(self):
         """Check for block collision in y axis."""
-        collided_platform = \
-        self.level.onscreen_map["blocks"].collide_any(self)
-        
+        collided_platform = self.level.onscreen_map["blocks"].collide_any(self)
+
         if collided_platform:
             # XXX
             # this test probably won't work though if a block
@@ -211,25 +192,23 @@ class Player:
             hit_ground = self.y_speed > 0
 
             if hit_ground:
-                self.rect.bottom = \
-                            collided_platform.rect.top
+                self.rect.bottom = collided_platform.rect.top
 
-                try: collided_platform.grass_walking(
-                                   self, self.rect.midbottom)
+                try:
+                    collided_platform.grass_walking(self, self.rect.midbottom)
 
-                except AttributeError: pass
+                except AttributeError:
+                    pass
 
-            else: self.rect.top = \
-                                collided_platform.rect.bottom
+            else:
+                self.rect.top = collided_platform.rect.bottom
 
             self.y_speed = 0
 
     def climb_x(self):
         """Calculate and perform climbing in x axis."""
         if self.x_speed:
-            self.rect.x += \
-                self.climb_speed if self.x_speed > 0 \
-                                 else -self.climb_speed
+            self.rect.x += self.climb_speed if self.x_speed > 0 else -self.climb_speed
 
         self.check_handle_collision_x()
         self.check_block_collision_x()
@@ -240,23 +219,20 @@ class Player:
     def climb_y(self):
         """Calculate and perform climbing in y axis."""
         if self.y_speed:
-            increment = \
-                self.climb_speed if self.y_speed > 0 \
-                                 else -self.climb_speed
+            increment = self.climb_speed if self.y_speed > 0 else -self.climb_speed
             self.rect.y += increment
             if self.is_touching_ground():
                 self.rect.y -= increment
                 self.assign_default_physics()
                 if self.ladder_to_ground_cooldown.finished:
-                    self.ladder_to_ground_cooldown = \
-                        add_task(empty_function, 100)
+                    self.ladder_to_ground_cooldown = add_task(empty_function, 100)
 
         self.check_handle_collision_y()
         self.check_block_collision_y()
         # must set to 0 only after block collision,
         # since collision mechanism in y axis rely on y_speed
         self.y_speed = 0
-    
+
     def assign_climbing(self):
         """Check climbing state and assign if needed."""
         if self.movement_routine != self.climb_physics:
@@ -279,7 +255,7 @@ class Player:
 
     def warp_scroll_player(self, handle):
         """Warp player according to scroll orientation.
-        
+
         handle
             An sprite object whose collision is used to
             detect when to scroll the screen. Such
@@ -287,9 +263,7 @@ class Player:
             method in the handle (but first we warp the
             player)."""
         if handle.rect.midtop == SCREEN_RECT.midtop:
-            self.rect.y = SCREEN_HEIGHT \
-                                 - handle.rect.height \
-                                 - self.rect.height
+            self.rect.y = SCREEN_HEIGHT - handle.rect.height - self.rect.height
 
         elif handle.rect.midbottom == SCREEN_RECT.midbottom:
             self.rect.y = handle.rect.height
@@ -298,9 +272,7 @@ class Player:
             self.rect.x = handle.rect.width
 
         elif handle.rect.midleft == SCREEN_RECT.midleft:
-            self.rect.x = SCREEN_WIDTH \
-                                 - handle.rect.width \
-                                 - self.rect.width
+            self.rect.x = SCREEN_WIDTH - handle.rect.width - self.rect.width
         handle.invoke()
 
     def apply_gravity_pull(self):
@@ -320,61 +292,53 @@ class Player:
                 self.anim_player.ensure_animation("jump")
 
             else:
-                self.anim_player.ensure_animation(
-                                            "jump_reverse")
+                self.anim_player.ensure_animation("jump_reverse")
         else:
             if self.x_speed:
 
                 if self.facing_right and self.x_speed > 0:
                     self.anim_player.ensure_animation("walk")
 
-                elif not self.facing_right \
-                        and self.x_speed < 0:
-                    self.anim_player.ensure_animation(
-                                              "walk_reverse")
+                elif not self.facing_right and self.x_speed < 0:
+                    self.anim_player.ensure_animation("walk_reverse")
 
                 elif self.facing_right and self.x_speed < 0:
-                    self.anim_player.ensure_animation(
-                                       "decelerate_reverse")
+                    self.anim_player.ensure_animation("decelerate_reverse")
                 else:
-                    self.anim_player.ensure_animation(
-                                               "decelerate")
-                    
+                    self.anim_player.ensure_animation("decelerate")
+
             else:
-                if self.is_crouched(): pass
+                if self.is_crouched():
+                    pass
 
                 else:
                     if self.facing_right:
-                        self.anim_player.ensure_animation(
-                                                     "idle")
+                        self.anim_player.ensure_animation("idle")
                     else:
-                        self.anim_player.ensure_animation(
-                                             "idle_reverse")
+                        self.anim_player.ensure_animation("idle_reverse")
 
     ### user controlled behaviour
     ### (there's more on interaction section when indicated)
-    
+
     def go_left(self):
         """Accelerate player to the left."""
         self.facing_right = False
         if self.x_speed > -self.max_walk_speed:
             self.x_speed += -self.x_accel
-        
-    
+
     def go_right(self):
         """Accelerate player to the right."""
         self.facing_right = True
         if self.x_speed < self.max_walk_speed:
             self.x_speed += self.x_accel
-            
-    
+
     def stop(self):
         """Decelerate player on x axis."""
         if self.x_speed > 0:
             self.x_speed -= 1
         elif self.x_speed < 0:
             self.x_speed += 1
-    
+
     def jump(self):
         """Move player contrary to gravity if on ground."""
         if self.is_touching_ground() or self.is_climbing():
@@ -397,14 +361,13 @@ class Player:
         if item:
 
             item.prepare_for_usage(self)
-            self.level.add_obj_to_group(
-                                    item, "equippable_items")
-    
+            self.level.add_obj_to_group(item, "equippable_items")
+
     ### Interaction methods (usually refer other objects)
-    
+
     def up_action(self):
         """Check for possible actions using up movement.
-        
+
         Options available depending on conditions:
         - Enter a door/cave/entrance to another level.
         - Climb ladders
@@ -414,43 +377,36 @@ class Player:
             if not self.is_leaving_ladder():
                 self.y_speed = -self.climb_speed
         elif self.is_touching_portal():
-                # XXX
-                # After entrance animation is timed
-                # use said time here before changing level
-                # so user see the entrance animation
-                # before 'entering'
-                portal = self.portal_holder.pop()
-                self.portal_holder = None
-                after_milliseconds = 100
-                distance = get_straight_distance(
-                                 self.rect.midbottom,
-                                 portal.rect.midbottom)
+            # XXX
+            # After entrance animation is timed
+            # use said time here before changing level
+            # so user see the entrance animation
+            # before 'entering'
+            portal = self.portal_holder.pop()
+            self.portal_holder = None
+            after_milliseconds = 100
+            distance = get_straight_distance(self.rect.midbottom, portal.rect.midbottom)
 
-                # 38 is arbitrary, just means it's close.
-                if distance <= 38 and self.health \
-                and self.is_touching_ground():
-                    set_level_switching(
-                                    after_milliseconds,
-                                    portal.next_level,
-                                    portal.destination)
+            # 38 is arbitrary, just means it's close.
+            if distance <= 38 and self.health and self.is_touching_ground():
+                set_level_switching(
+                    after_milliseconds, portal.next_level, portal.destination
+                )
 
     def down_action(self):
         """Check for possible actions using up movement.
-        
+
         Options available depending on conditions:
         - Crouch
         - Climb ladders
         """
         if self.is_touching_ground() and not self.x_speed:
             if self.facing_right:
-                self.anim_player.ensure_animation(
-                                             "crouched_idle")
+                self.anim_player.ensure_animation("crouched_idle")
             else:
-                self.anim_player.ensure_animation(
-                                     "crouched_idle_reverse")
+                self.anim_player.ensure_animation("crouched_idle_reverse")
 
-        elif self.is_touching_ladder() \
-          and self.ladder_to_ground_cooldown.finished:
+        elif self.is_touching_ladder() and self.ladder_to_ground_cooldown.finished:
             self.assign_climbing()
             self.y_speed = self.climb_speed
 
@@ -465,14 +421,13 @@ class Player:
     # also controlled by user
     def interact(self):
         """Trigger interactions if available.
-        
+
         This method detects interactive objects near the
         player and trigger whatever interaction they
         may have. Such interactions may include
         dialogues, monologues, getting items, etc."""
         actors_onscreen = self.level.onscreen_map["actors"]
-        middle_props_onscreen = \
-                    self.level.onscreen_map["middle_props"]
+        middle_props_onscreen = self.level.onscreen_map["middle_props"]
         props = []
         props.extend(actors_onscreen)
         props.extend(middle_props_onscreen)
@@ -485,34 +440,31 @@ class Player:
             # don't have).
             sprite_distance_pairs = []
             for prop in props:
-                distance = get_straight_distance(
-                                    prop.rect.center,
-                                    self.rect.center)
+                distance = get_straight_distance(prop.rect.center, self.rect.center)
                 if distance < 128:
-                    sprite_distance_pairs.append(
-                                           (prop, distance)) 
+                    sprite_distance_pairs.append((prop, distance))
 
-            closer_prop_pair = min(sprite_distance_pairs,
-                                   default=None,
-                                   key=lambda seq: seq[1])
+            closer_prop_pair = min(
+                sprite_distance_pairs, default=None, key=lambda seq: seq[1]
+            )
 
             if closer_prop_pair:
 
                 closer_prop = closer_prop_pair[0]
 
-                try: closer_prop.receive_interaction(self)
+                try:
+                    closer_prop.receive_interaction(self)
                 except AttributeError as err:
 
                     if "receive_interaction" in str(err):
-                        msg = "Expected AttributeError" \
-                              + " was silenced."
+                        msg = "Expected AttributeError" + " was silenced."
                         logger.info(msg)
 
                     else:
                         msg = "Unexpected Attribute Error"
                         logger.exception(msg)
                         raise err
-    
+
     def send_dialogue(self, dialogue):
         """Send dialogue to dialogue_manager."""
         self.dialogue_manager.get_dialogue(dialogue)
@@ -545,8 +497,10 @@ class Player:
         """
         if self.inventory_manager.add(item):
 
-            if report_to: report_to.got_item()
-            else: item.got_item()
+            if report_to:
+                report_to.got_item()
+            else:
+                item.got_item()
 
     def say_full_inventory(self):
         """Play a 'full inventory' dialogue."""
@@ -557,8 +511,7 @@ class Player:
     def is_touching_ground(self):
         """Return True if touching ground."""
         self.rect.y += 2
-        platform_bellow = \
-          self.level.onscreen_map["blocks"].collide_any(self)
+        platform_bellow = self.level.onscreen_map["blocks"].collide_any(self)
         self.rect.y += -2
 
         if platform_bellow:
@@ -570,21 +523,18 @@ class Player:
         """Return True if leaving a ladder by going up."""
         self.rect.y += -self.climb_speed
         leaving_ladder = not self.is_touching_ladder()
-        self.rect.y +=  self.climb_speed
+        self.rect.y += self.climb_speed
         return leaving_ladder
 
     def is_touching_ladder(self):
         """Return True if touching a ladder."""
         touching_ladder = False
 
-        middle_props = \
-            self.level.onscreen_map[
-                        "middle_props"].collide(self)
+        middle_props = self.level.onscreen_map["middle_props"].collide(self)
 
         if middle_props:
             touching_ladder = [
-              obj for obj in middle_props
-              if "climbable" in obj.prop_name
+                obj for obj in middle_props if "climbable" in obj.prop_name
             ]
 
         return touching_ladder
@@ -593,34 +543,32 @@ class Player:
         """Return True if touching a portal."""
         touching_portal = False
 
-        middle_props = \
-            self.level.onscreen_map[
-                        "middle_props"].collide(self)
+        middle_props = self.level.onscreen_map["middle_props"].collide(self)
 
         # XXX
         # use portal substring to indicate a portal
         # or use a better way if you think of any
         if middle_props:
-            touching_portal = \
-                    [obj for obj in middle_props
-                     if obj.prop_name in ("simple_door",
-                                          "cave_entrance")]
+            touching_portal = [
+                obj
+                for obj in middle_props
+                if obj.prop_name in ("simple_door", "cave_entrance")
+            ]
             self.portal_holder = touching_portal
 
         return touching_portal
 
     def is_climbing(self):
         """Return True if playing is climbing."""
-        return (self.movement_routine == self.climb_physics)
+        return self.movement_routine == self.climb_physics
 
     def is_crouched(self):
         """Return True if player is crouched."""
-        return self.anim_player.anim_name in (
-            "crouched_idle", "crouched_idle_reverse")
+        return self.anim_player.anim_name in ("crouched_idle", "crouched_idle_reverse")
 
     def die(self):
         """Start a death animation and cue level restart.
-        
+
         Also play a death SFX."""
         # XXX
         # 2018-01-26 06:58:57
@@ -646,16 +594,14 @@ class Player:
                     self.anim_player.ensure_animation("walk")
 
                 else:
-                    self.anim_player.ensure_animation(
-                                              "walk_reverse")
+                    self.anim_player.ensure_animation("walk_reverse")
             else:
 
                 if self.facing_right:
                     self.anim_player.ensure_animation("idle")
 
                 else:
-                    self.anim_player.ensure_animation(
-                                              "idle_reverse")
+                    self.anim_player.ensure_animation("idle_reverse")
 
     def skip_interactions(self):
         self.dialogue_manager.skip_dialoguebox()
@@ -668,13 +614,13 @@ class Player:
         to control player behaviour.
         """
         actions = {
-          "advance_deny" : self.skip_interactions,
-          "interact"     : self.interact,
-          "fire_item"    : self.use_equipped_item,
-          "jump"         : self.jump,
-          "player_left"  : self.go_left,
-          "player_right" : self.go_right,
-          "stop"         : self.stop
+            "advance_deny": self.skip_interactions,
+            "interact": self.interact,
+            "fire_item": self.use_equipped_item,
+            "jump": self.jump,
+            "player_left": self.go_left,
+            "player_right": self.go_right,
+            "stop": self.stop,
         }
 
         register_actions("player", actions)

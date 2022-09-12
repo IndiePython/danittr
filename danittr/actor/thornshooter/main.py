@@ -1,8 +1,6 @@
 """Facility for the actors layer."""
 
-from ...appcommon.task import (
-                                       add_task,
-                                       add_sendoff_task)
+from ...appcommon.task import add_task, add_sendoff_task
 from ...appcommon.anim.player.main import AnimationPlayer
 
 from .healthbar import HealthBar
@@ -26,19 +24,19 @@ from .thornbullet import ThornBullet
 
 class ThornShooter(object):
     """A thorn-shooting static plant."""
-    
+
     level = None
 
-    def __init__(
-        self,
-        prop_name, coordinates, health, revive_countdown):
+    def __init__(self, prop_name, coordinates, health, revive_countdown):
         """Assign variables. and perform setups."""
         self.prop_name = prop_name
 
         self.anim_player = AnimationPlayer(
-                                self, prop_name,
-                                coordinates_name="bottomleft",
-                                coordinates_value=coordinates)
+            self,
+            prop_name,
+            coordinates_name="bottomleft",
+            coordinates_value=coordinates,
+        )
 
         self.anim_player.play()
 
@@ -46,7 +44,6 @@ class ThornShooter(object):
         self.revive_countdown = revive_countdown
 
         self.set_operation_structure()
-
 
     def set_operation_structure(self):
         """Set other important operational structutes.
@@ -56,26 +53,25 @@ class ThornShooter(object):
 
         self.healthbar = HealthBar(self)
 
-        self.bullet = ThornBullet(
-                              self.rect.center,
-                              self.level)
+        self.bullet = ThornBullet(self.rect.center, self.level)
 
         add_sendoff_task(self.store_data)
         self.pre_saving_routine = self.store_data
 
         if not self.health:
-            self.revive_task = \
-                add_task(self.revive, self.revive_countdown)
+            self.revive_task = add_task(self.revive, self.revive_countdown)
 
     def update(self):
         """Update object state."""
-        if self.health: self.bullet.update()
+        if self.health:
+            self.bullet.update()
 
         self.anim_player.update()
 
     def draw(self):
         """Update object state."""
-        if self.health: self.bullet.draw()
+        if self.health:
+            self.bullet.draw()
 
         self.anim_player.draw()
         self.healthbar.draw()
@@ -94,11 +90,8 @@ class ThornShooter(object):
         # XXX
         # some audio/visual feedback code should be here
 
-        self.json_data["revive_countdown"] = \
-                     self.revive_countdown = 10000
-        self.revive_task = \
-            add_task(self.revive, self.json_data[
-                                          "revive_countdown"])
+        self.json_data["revive_countdown"] = self.revive_countdown = 10000
+        self.revive_task = add_task(self.revive, self.json_data["revive_countdown"])
 
     def revive(self):
         """Revive the object."""
@@ -106,8 +99,7 @@ class ThornShooter(object):
         # some audio/visual feedback
         # here
         self.json_data["health"] = self.health = 100
-        self.json_data["revive_countdown"] = \
-                     self.revive_countdown = 0
+        self.json_data["revive_countdown"] = self.revive_countdown = 0
         self.healthbar.revive()
         self.bullet.reset_position()
 
@@ -116,10 +108,10 @@ class ThornShooter(object):
         self.json_data["health"] = self.health
 
         if not self.health:
-            self.json_data["revive_countdown"] = \
-                self.revive_task.get_remaining()
+            self.json_data["revive_countdown"] = self.revive_task.get_remaining()
 
-        else: self.json_data["revive_countdown"] = 0
+        else:
+            self.json_data["revive_countdown"] = 0
 
     def suffer_damage(self, damage):
         """Subtract damage from player healthbar."""

@@ -17,25 +17,25 @@ class AnimatedObject:
     """Animated object to hold animation."""
 
     def __init__(
-        self, anim_data_key, tasks,
+        self,
+        anim_data_key,
+        tasks,
         exchange_pos_attrs=("center", "center"),
-        offset=(0, 0)):
+        offset=(0, 0),
+    ):
         """Create attributes."""
         ### retrieve coordinates name and value for
         ### animated object
 
         rect_attr, screen_rect_attr = exchange_pos_attrs
 
-        pos_value = \
-            getattr(
-                SCREEN_RECT.move(offset), screen_rect_attr)
+        pos_value = getattr(SCREEN_RECT.move(offset), screen_rect_attr)
 
         ### instantiate animation player
 
         self.anim_player = AnimationPlayer(
-                             self, anim_data_key,
-                             coordinates_value=pos_value,
-                             coordinates_name=rect_attr)
+            self, anim_data_key, coordinates_value=pos_value, coordinates_name=rect_attr
+        )
 
         self.anim_player.play()
 

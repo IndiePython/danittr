@@ -1,20 +1,18 @@
 """Facility for load screen management."""
 
-from math      import radians
-from os.path   import join
+from math import radians
+from os.path import join
 from itertools import cycle
 
 ### third-party imports
 
-from pygame.time    import wait, get_ticks as get_millisecs
-from pygame.image   import load as load_image
+from pygame.time import wait, get_ticks as get_millisecs
+from pygame.image import load as load_image
 from pygame.display import update
 
 ### local imports
 
-from ..config import (
-                   SCREEN, SCREEN_RECT, MILLISECS_PER_FRAME,
-                   IMAGES_DIR)
+from ..config import SCREEN, SCREEN_RECT, MILLISECS_PER_FRAME, IMAGES_DIR
 
 from ..palette import BLACK, WHITE
 from ..logconfig import APP_LOGGER
@@ -27,6 +25,7 @@ logger = APP_LOGGER.getChild(__name__)
 
 ### class definition
 
+
 class LoadScreenManager:
     """Common behaviour/objects for elegant screen loading."""
 
@@ -38,41 +37,42 @@ class LoadScreenManager:
 
         topright = SCREEN_RECT.move(-50, 35).topright
 
-        self.wait_text = \
-             render_text(
-                "Please wait...", font_size=36,
-                foreground_color=BLACK,
-                return_obj=True,
-                coordinates_name="topright",
-                coordinates_value=topright)
+        self.wait_text = render_text(
+            "Please wait...",
+            font_size=36,
+            foreground_color=BLACK,
+            return_obj=True,
+            coordinates_name="topright",
+            coordinates_value=topright,
+        )
 
         ## resources text
 
         center = SCREEN_RECT.move(0, 40).center
 
-        self.resources_text = \
-             render_text(
-                "Loading resources...", font_size=36,
-                foreground_color=BLACK,
-                return_obj=True,
-                coordinates_name="center",
-                coordinates_value=center)
+        self.resources_text = render_text(
+            "Loading resources...",
+            font_size=36,
+            foreground_color=BLACK,
+            return_obj=True,
+            coordinates_name="center",
+            coordinates_value=center,
+        )
 
         self.millisecs_count = 0
 
         ### load surface objects for simple loading animation
 
         mushroom_filenames = (
-          "mushroom_topleft.png",
-          "mushroom_topright.png",
-          "mushroom_bottomright.png",
-          "mushroom_bottomleft.png"
+            "mushroom_topleft.png",
+            "mushroom_topright.png",
+            "mushroom_bottomright.png",
+            "mushroom_bottomleft.png",
         )
 
         surfs = [
-          load_image(
-            join(IMAGES_DIR, filename)).convert_alpha()
-          for filename in mushroom_filenames
+            load_image(join(IMAGES_DIR, filename)).convert_alpha()
+            for filename in mushroom_filenames
         ]
 
         ### store a function to indefinitely return the next
@@ -121,14 +121,13 @@ class LoadScreenManager:
 
             self.resources_text.draw()
 
-            SCREEN.blit(
-                self.get_next_surf(), self.mushroom_rect)
+            SCREEN.blit(self.get_next_surf(), self.mushroom_rect)
 
             update()
 
             self.millisecs_count = current_millisecs
 
+
 load_screen_manager = LoadScreenManager()
 blit_loading_screen = load_screen_manager.blit_loading_screen
-blit_resource_loading = \
-                     load_screen_manager.blit_resource_loading
+blit_resource_loading = load_screen_manager.blit_resource_loading

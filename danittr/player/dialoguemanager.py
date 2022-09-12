@@ -21,35 +21,39 @@ class DialogueManager:
 
     def __init__(self, player):
         """Initialize superclass and set variables.
-        
+
         player
             A reference to the instance of player.main.Player
             class.
         """
-        self.player   = player
+        self.player = player
         self.dialogue = None
-        self.image    = INVISIBLE_SURF.copy()
-        self.rect     = self.image.get_rect()
+        self.image = INVISIBLE_SURF.copy()
+        self.rect = self.image.get_rect()
 
     def update(self):
         """Update object state."""
-        try: self.dialogue.update()
+        try:
+            self.dialogue.update()
 
         ### when dialogue attribute is None, due to
         ### trying accessing update attribute
-        except AttributeError: pass
+        except AttributeError:
+            pass
 
     def draw(self):
         """Update object state."""
-        try: self.dialogue.draw()
+        try:
+            self.dialogue.draw()
 
         ### when dialogue attribute is None, due to
         ### trying accessing draw attribute
-        except AttributeError: pass
+        except AttributeError:
+            pass
 
     def get_dialogue(self, dialogue_pairs):
         """Instantiate a dialogue box.
-        
+
         dialogue_pairs
             A list containing tuples with pairs of
             information. Such information consists
@@ -58,10 +62,8 @@ class DialogueManager:
             This list is generated in
             appcommon/dialoguefactory.py
         """
-        self.dialogue = DialogueDisplay(self,
-                                        self.player,
-                                        dialogue_pairs)
-    
+        self.dialogue = DialogueDisplay(self, self.player, dialogue_pairs)
+
     def finish_dialogue(self):
         """Set current dialogue to None."""
         self.dialogue = None
@@ -77,7 +79,7 @@ class DialogueDisplay(BasicObject):
 
     def __init__(self, manager, player, dialoguebox_pairs):
         """Initialize superclass and prepare sprites.
-        
+
         manager
             The instance of
             player.dialoguemanager.DialogueManager
@@ -92,7 +94,7 @@ class DialogueDisplay(BasicObject):
             appcommon/dialoguefactory.py
         """
         self.manager = manager
-        self.player  = player
+        self.player = player
 
         self.dialogue_setup(dialoguebox_pairs)
 
@@ -112,7 +114,8 @@ class DialogueDisplay(BasicObject):
 
     def update(self):
         """Update object state."""
-        if self.is_following_player: self.adjust_position()
+        if self.is_following_player:
+            self.adjust_position()
 
     def switch_sprite(self):
         """Switch to next sprite, if any, or finish."""
@@ -122,7 +125,7 @@ class DialogueDisplay(BasicObject):
             self.manager.finish_dialogue()
         else:
             self.image = dialogue_info[1]
-            self.rect  = self.image.get_rect()
+            self.rect = self.image.get_rect()
 
             position = dialogue_info[0]
             if position == "player_pos":
@@ -130,11 +133,10 @@ class DialogueDisplay(BasicObject):
                 self.adjust_position()
             else:
                 self.is_following_player = False
-                self.rect.midbottom      = position
+                self.rect.midbottom = position
 
     def adjust_position(self):
         """Adjust dialoguebox position to follow player."""
-        player_midtop        = self.player.rect.midtop
-        offset_player_midtop = (player_midtop[0],
-                                player_midtop[1]-32)
-        self.rect.midbottom  = offset_player_midtop
+        player_midtop = self.player.rect.midtop
+        offset_player_midtop = (player_midtop[0], player_midtop[1] - 32)
+        self.rect.midbottom = offset_player_midtop

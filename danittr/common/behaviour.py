@@ -8,8 +8,8 @@
 
 """
 
-from functools   import partial, reduce
-from operator    import methodcaller
+from functools import partial, reduce
+from operator import methodcaller
 from collections import deque
 
 
@@ -18,7 +18,7 @@ class CallList(list):
 
     def __init__(self, *args, **kwargs):
         """Check callable state of items.
-        
+
         Extends list.__init__
         """
         super().__init__(*args, **kwargs)
@@ -46,7 +46,7 @@ class CallList(list):
 
     def extend(self, iterable):
         """Extend call list if all in iterable are callable.
-        
+
         Extends list.extend.
         """
         if not all(map(callable, iterable)):
@@ -82,21 +82,17 @@ class NestedPartial(partial):
     arguments, in which case partials are required).
     """
 
-
     def __call__(self):
         """Return func return value after executing args."""
         ### retrieve positional arguments' return values if
         ### they are callable, otherwise just use themselves
-        args = (
-          arg() if callable(arg) else arg
-          for arg in self.args
-        )
+        args = (arg() if callable(arg) else arg for arg in self.args)
 
         ### retrieve keyword arguments' return values if they
         ### are callable, otherwise just use themselves
         kwargs = {
-          key: value() if callable(value) else value
-          for key, value in self.keywords.items()
+            key: value() if callable(value) else value
+            for key, value in self.keywords.items()
         }
 
         ### return the return value of self.func called
@@ -106,7 +102,7 @@ class NestedPartial(partial):
 
 def empty_function():
     """Do nothing. An empty function.
-    
+
     Replaces 'lambda:None' solution.
 
     Some respected members in the pygame community don't
@@ -130,7 +126,7 @@ def empty_function():
     Doctest of my life
 
     >>> empty_function()
-    >>> 
+    >>>
 
     Disclaimer: for a function which does nothing, I know
     it has quite the docstring (including its doctest),
@@ -141,9 +137,10 @@ def empty_function():
     analytical thinking.
     """
 
+
 def get_nested_value(d, *strings):
     """Return inner value from nested dict.
-    
+
     d (dict)
         Dictionary containing other nested dictionaries.
     strings (string arguments)
@@ -182,12 +179,13 @@ def get_nested_value(d, *strings):
     """
     return reduce(dict.__getitem__, strings, d)
 
+
 ### attribute utilities
 
 ## routine setting
 
-def get_routine_caller(
-    obj, routine_name, starting_value=empty_function):
+
+def get_routine_caller(obj, routine_name, starting_value=empty_function):
     """Return function which calls an specific routine.
 
     Also sets an initial value for the routine in the
@@ -202,12 +200,12 @@ def get_routine_caller(
         is called instead.
 
     >>> class Obj: pass
-    ... 
+    ...
     >>> obj = Obj()
     >>> def a(): print("a")
-    ... 
+    ...
     >>> def b(): print("b")
-    ... 
+    ...
     >>> routine_caller = get_routine_caller(obj, "printer")
     >>> routine_caller()
     >>> obj.printer = a
@@ -216,14 +214,16 @@ def get_routine_caller(
     >>> obj.printer = b
     >>> routine_caller()
     b
-    >>> 
+    >>>
 
     """
     setattr(obj, routine_name, starting_value)
 
     return partial(methodcaller(routine_name), obj)
 
+
 ## toggling utilities
+
 
 def get_attribute_rotator(obj, attr_name, values):
     """Return a function to rotate obj attribute values.
@@ -247,9 +247,8 @@ def get_attribute_rotator(obj, attr_name, values):
 
     setattr(obj, attr_name, values_deque[0])
 
-    return partial(rotate_attribute,
-                   obj, attr_name, values_deque)
-    
+    return partial(rotate_attribute, obj, attr_name, values_deque)
+
 
 def rotate_attribute(obj, attr_name, values_deque):
     """Rotate attribute value between those provided.
@@ -269,7 +268,7 @@ def rotate_attribute(obj, attr_name, values_deque):
         values between which to toggle.
 
     >>> class Obj: pass
-    ... 
+    ...
     >>> obj = Obj()
     >>> d = deque(["a", "b", "c"])
     >>> rotate = partial(rotate_attribute, obj, "char", d)
@@ -301,8 +300,8 @@ def rotate_attribute(obj, attr_name, values_deque):
 
 
 def get_attribute_toggler(
-    obj, attr_name, starting_value, mapping_or_value,
-    default=None):
+    obj, attr_name, starting_value, mapping_or_value, default=None
+):
     """Return function to toggle obj atribute values.
 
     Creates a partial from the provided arguments using
@@ -348,7 +347,7 @@ def get_attribute_toggler(
         Value to use only in case no key is found.
 
     >>> class Obj: pass
-    ... 
+    ...
     >>> obj = Obj()
     >>> toggle_char = get_attribute_toggler(
     ...                   obj, 'char', 'a', 'b')
@@ -360,7 +359,7 @@ def get_attribute_toggler(
     >>> obj.char = 'c'
     >>> toggle_char()
     >>> obj.char # without default it returns None
-    >>> 
+    >>>
 
     >>> obj.char = 'a'
     >>> toggle_char()
@@ -399,17 +398,15 @@ def get_attribute_toggler(
         another_value = mapping_or_value
 
         cross_mapped_values = {
-          starting_value : another_value,
-          another_value  : starting_value
+            starting_value: another_value,
+            another_value: starting_value,
         }
 
     ### return function
-    return partial(
-             toggle_attribute,
-             obj, attr_name, cross_mapped_values, default)
+    return partial(toggle_attribute, obj, attr_name, cross_mapped_values, default)
 
-def toggle_attribute(
-    obj, attr_name, cross_mapped_values, default=None):
+
+def toggle_attribute(obj, attr_name, cross_mapped_values, default=None):
     """Toggle attribute between values a and b.
 
     This function is meant to be turned into partials
@@ -433,7 +430,7 @@ def toggle_attribute(
         Value to use only in case no key is found.
 
     >>> class Obj: pass
-    ... 
+    ...
     >>> obj = Obj()
     >>> d = {"a":"b", "b":"a"}
     >>> toggler = partial(toggle_attribute, obj, "char", d)
@@ -455,4 +452,3 @@ def toggle_attribute(
 
     ### assign value to the attribute
     setattr(obj, attr_name, value)
-

@@ -4,12 +4,8 @@ from functools import partialmethod
 
 ### third-party imports
 
-from pygame.mouse import (
-                         get_pos     as get_mouse_pos,
-                         get_pressed as get_mouse_pressed)
-from pygame.draw  import (
-                         rect as draw_rect,
-                         line as draw_line)
+from pygame.mouse import get_pos as get_mouse_pos, get_pressed as get_mouse_pressed
+from pygame.draw import rect as draw_rect, line as draw_line
 
 ### local imports
 
@@ -26,12 +22,12 @@ from ...palette import BLACK, WHITE
 
 def get_button(text, topleft, command):
     """Return a button-like object that can be invoked."""
-    button = render_text(text, 32, return_obj=True,
-                         coordinates_value=topleft,
-                         foreground_color=WHITE)
+    button = render_text(
+        text, 32, return_obj=True, coordinates_value=topleft, foreground_color=WHITE
+    )
 
     button.invoke = command
-    button.image  = give_depth_finish(button.image)
+    button.image = give_depth_finish(button.image)
 
     # XXX rethink the design in the code below
 
@@ -40,7 +36,7 @@ def get_button(text, topleft, command):
         """Simple function to blit button."""
         SCREEN.blit(button.image, button.rect)
 
-    button.draw   = blit_button
+    button.draw = blit_button
     button.update = empty_function
 
     return button
@@ -49,8 +45,7 @@ def get_button(text, topleft, command):
 class VolumeScale(object):
     """A custom scale widgets from 0.0 to 1.0."""
 
-    def __init__(self, mapping, field, topleft,
-                 update_command, feedback_command=None):
+    def __init__(self, mapping, field, topleft, update_command, feedback_command=None):
         """Assign variables and perform setups.
 
         mapping
@@ -66,22 +61,21 @@ class VolumeScale(object):
             A command to be executed after updating the value.
             Used to provide feedback. Defaults to None
         """
-        self.mapping        = mapping
-        self.field          = field
+        self.mapping = mapping
+        self.field = field
         self.update_command = update_command
         if feedback_command:
             self.feedback_command = feedback_command
         else:
             self.feedback_command = empty_function
 
-        surf       = render_rect(540, 50, BLACK)
+        surf = render_rect(540, 50, BLACK)
         self.image = give_depth_finish(surf)
-        self.rect  = self.image.get_rect()
+        self.rect = self.image.get_rect()
         self.rect.topleft = topleft
 
         draw_line(self.image, WHITE, (20, 25), (520, 25), 3)
-        self.handle = render_rect(16, 16, WHITE,
-                                  return_obj=True)
+        self.handle = render_rect(16, 16, WHITE, return_obj=True)
         self.place_handle()
         self.mouse_pressed = False
 
@@ -159,29 +153,26 @@ class VolumeScale(object):
             Integer. Mouse x coordinate relative to screen
             and constrained to it.
         """
-        left_edge  = self.rect.x + 20
+        left_edge = self.rect.x + 20
         right_edge = self.rect.x + self.rect.w - 20
         if left_edge <= mouse_x <= right_edge:
             self.handle.rect.centerx = mouse_x
         elif mouse_x > right_edge:
-            self.handle.rect.centerx = \
-                self.rect.x + self.rect.w - 20
+            self.handle.rect.centerx = self.rect.x + self.rect.w - 20
         elif mouse_x < left_edge:
-            self.handle.rect.centerx = \
-                self.rect.x + 20
+            self.handle.rect.centerx = self.rect.x + 20
 
     def update_value(self):
         """Update mapping[field] using handle position."""
-        offset = self.handle.rect.centerx \
-                 - (self.rect.x + 20)
-        value  = offset / 500
+        offset = self.handle.rect.centerx - (self.rect.x + 20)
+        value = offset / 500
         self.mapping[self.field] = value
         self.update_command()
         self.feedback_command()
 
     def increment_amount(self, amount):
         """Increment value according to amount.
-        
+
         amount
             Any number that can be added to the volume value.
             The result will be clamped to the allowed
@@ -194,5 +185,5 @@ class VolumeScale(object):
         self.place_handle()
         self.update_value()
 
-    increase = partialmethod(increment_amount,  0.05)
+    increase = partialmethod(increment_amount, 0.05)
     decrease = partialmethod(increment_amount, -0.05)

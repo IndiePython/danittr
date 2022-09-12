@@ -1,8 +1,6 @@
 """Player class facility."""
 
-from ..config import (
-                             SCREEN,
-                             SCREEN_WIDTH, SCREEN_HEIGHT)
+from ..config import SCREEN, SCREEN_WIDTH, SCREEN_HEIGHT
 from ..common.behaviour import empty_function
 from ..appcommon.surf import render_image, INVISIBLE_SURF
 
@@ -12,9 +10,7 @@ from ..appcommon.surf import render_image, INVISIBLE_SURF
 # black background behind the items to
 # give a bit contrast with the game world
 
-SURFACE_MAP = {
-  "mushroom" : render_image("mushroom_topleft.png")
-}
+SURFACE_MAP = {"mushroom": render_image("mushroom_topleft.png")}
 
 
 class EquippedDisplay:
@@ -23,7 +19,7 @@ class EquippedDisplay:
     def __init__(self):
         """Initialize superclass and set variables."""
         self.image = INVISIBLE_SURF
-        self.rect  = self.image.get_rect()
+        self.rect = self.image.get_rect()
 
         self.perform_setup()
 
@@ -31,9 +27,9 @@ class EquippedDisplay:
 
     def perform_setup(self):
         """Set useful variables for operation."""
-        self.current_item_name    = None
-        self.current_item_count   = 0
-        self.positions            = []
+        self.current_item_name = None
+        self.current_item_count = 0
+        self.positions = []
 
     def draw(self):
         """Update object state."""
@@ -58,7 +54,7 @@ class EquippedDisplay:
 
     def calculate_surface_positions(self):
         """Calculate positions to blit self.image.
-        
+
         This takes into account the dimensions of the
         current item surface to give a pleasing padding/
         offset, so the surfaces aren't displayed too far
@@ -76,7 +72,7 @@ class EquippedDisplay:
 
         surfaces_distance = horizontal_padding + surf_width
         for i in range(6):
-            offset   = surfaces_distance * i
+            offset = surfaces_distance * i
             position = (x - offset, y)
 
             self.positions.append(position)

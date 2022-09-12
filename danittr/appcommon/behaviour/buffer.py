@@ -1,6 +1,6 @@
 """Facility for application specific behaviours."""
 
-from os      import listdir, remove
+from os import listdir, remove
 from os.path import join
 
 ### local imports
@@ -16,7 +16,7 @@ logger = APP_LOGGER.getChild(__name__)
 
 def remove_buffers():
     """Remove existing buffers.
-    
+
     This happens whenever the player quits to main menu
     or game, abandoning the current state/level data,
     present in the buffers. This just means all buffer
@@ -26,10 +26,12 @@ def remove_buffers():
 
     ### get the current name of the folder representing
     ### the game slot used
-    try: save_dir = GAME_REFS.dirname
+    try:
+        save_dir = GAME_REFS.dirname
 
     ### if it is missing, return earlier
-    except AttributeError: return
+    except AttributeError:
+        return
 
     ### Get and remove all buffers (.swp files) in current
     ### save dir
@@ -37,9 +39,10 @@ def remove_buffers():
     full_save_dir = join(SAVES_DIR, save_dir)
 
     buffers = [
-      join(SAVES_DIR, save_dir, item)
-      for item in listdir(full_save_dir)
-      if item.endswith(".swp")
+        join(SAVES_DIR, save_dir, item)
+        for item in listdir(full_save_dir)
+        if item.endswith(".swp")
     ]
-    
-    for item in buffers: remove(item)
+
+    for item in buffers:
+        remove(item)

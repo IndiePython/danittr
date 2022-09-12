@@ -3,7 +3,7 @@
 Used as parallax decorative elements.
 """
 
-from random    import seed, randint
+from random import seed, randint
 from functools import partial
 
 from ..appcommon.anim.player.main import AnimationPlayer
@@ -19,7 +19,7 @@ class Cloud:
 
     def __init__(self, prop_name, bottomleft, anim_name):
         """Position and perform setups.
-        
+
         prop_name
             String representing the name of the prop.
         bottomleft
@@ -30,9 +30,8 @@ class Cloud:
         """
         self.prop_name = prop_name
         self.anim_player = AnimationPlayer(
-                                self, prop_name,
-                                coordinates_name="bottomleft",
-                                coordinates_value=bottomleft)
+            self, prop_name, coordinates_name="bottomleft", coordinates_value=bottomleft
+        )
 
         self.anim_player.switch_animation(anim_name)
 
@@ -46,7 +45,8 @@ class Cloud:
         # XXX it is better to move only once by the
         # amount you pick, instead of multiple times
         # moving single units
-        for i in range(randint(0, 15)): anim_task()
+        for i in range(randint(0, 15)):
+            anim_task()
 
         add_task(anim_task, ANIM_TIME, cyclic=True)
 
@@ -58,7 +58,7 @@ class Cloud:
         dy
             Integer indicating scrolling in y axis.
         """
-        self.rect.move_ip(dx/80, dy/80)
+        self.rect.move_ip(dx / 80, dy / 80)
 
     def update(self):
         """Update animation."""

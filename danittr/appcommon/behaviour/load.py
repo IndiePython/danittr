@@ -1,7 +1,6 @@
-
-from os      import listdir, remove, mkdir
+from os import listdir, remove, mkdir
 from os.path import join
-from shutil  import copyfile
+from shutil import copyfile
 
 ### local imports
 
@@ -19,8 +18,7 @@ def load_game():
     """Return level name from the current save slot used."""
     logger.info("Loading a new save.")
 
-    save_state_data = load_json(
-        join(SAVES_DIR, GAME_REFS.dirname, STATE_FILE_NAME))
+    save_state_data = load_json(join(SAVES_DIR, GAME_REFS.dirname, STATE_FILE_NAME))
 
     last_level_name = save_state_data["last_level"]
 

@@ -1,14 +1,18 @@
-from os      import listdir, mkdir
+from os import listdir, mkdir
 from os.path import join
-from shutil  import copyfile
+from shutil import copyfile
 
 ### local imports
 
 from ...logconfig import APP_LOGGER
 
 from ...config import (
-                   GAME_REFS, SAVES_DIR, STATE_FILE_NAME,
-                   DEFAULT_STATE_DATA, IMAGES_DIR)
+    GAME_REFS,
+    SAVES_DIR,
+    STATE_FILE_NAME,
+    DEFAULT_STATE_DATA,
+    IMAGES_DIR,
+)
 
 from ...common.timehandler import get_isostring_datetime
 from ...common.jsonhandler import save_json
@@ -37,29 +41,30 @@ def save_game():
 
     state_swap_path = state_path + ".swp"
 
-    try: copyfile(state_swap_path, state_path)
+    try:
+        copyfile(state_swap_path, state_path)
 
     except FileNotFoundError as err:
-        msg = "Didn't found state swap file" \
-              + " in " + save_dir + " save."
+        msg = "Didn't found state swap file" + " in " + save_dir + " save."
         logger.exception(msg)
         raise err
 
     ### Saving levels
 
-    levels_dir  = join(SAVES_DIR, save_dir)
+    levels_dir = join(SAVES_DIR, save_dir)
 
     level_files = [
-      join(SAVES_DIR, save_dir, item)
-      for item in listdir(levels_dir)
-      if item.endswith(".lvl")
+        join(SAVES_DIR, save_dir, item)
+        for item in listdir(levels_dir)
+        if item.endswith(".lvl")
     ]
 
     for level_path in level_files:
 
         level_swap_path = "{}.swp".format(level_path)
 
-        try: copyfile(level_swap_path, level_path)
+        try:
+            copyfile(level_swap_path, level_path)
 
         except FileNotFoundError as err:
 
@@ -77,11 +82,17 @@ def save_game():
             # dissatisfied with how I'm logging it,
             # it isn't clear. Solve this.
 
-            msg = "Didn't found level swap path" \
-                  + " called " + level_swap_path \
-                  + " in " + save_dir + " save."
+            msg = (
+                "Didn't found level swap path"
+                + " called "
+                + level_swap_path
+                + " in "
+                + save_dir
+                + " save."
+            )
 
             logger.exception(msg)
+
 
 def setup_new_save(directory_name):
     """Setup all files for a new game save/slot."""
@@ -89,15 +100,13 @@ def setup_new_save(directory_name):
 
     new_save_dir = join(SAVES_DIR, directory_name)
     mkdir(new_save_dir)
-    
+
     state_data = DEFAULT_STATE_DATA.copy()
-    state_data["last_played_datetime"] = \
-                                get_isostring_datetime()
-    
+    state_data["last_played_datetime"] = get_isostring_datetime()
+
     state_filepath = join(new_save_dir, STATE_FILE_NAME)
     save_json(state_data, state_filepath)
 
-    thumb_file        = join(IMAGES_DIR, "new_save_thumb.png")
+    thumb_file = join(IMAGES_DIR, "new_save_thumb.png")
     thumb_destination = join(new_save_dir, "thumb.png")
     copyfile(thumb_file, thumb_destination)
-

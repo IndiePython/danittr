@@ -6,7 +6,7 @@ from ..appcommon.anim.player.main import AnimationPlayer
 
 class ToxicPollenCloud:
     """A circular-shaped toxic cloud of pollen.
-    
+
     It deals a little damage in touching actors or player.
     It exists as an attribute of a Mushroom instance until
     said instance hits the ground as a projectile. When this
@@ -20,18 +20,17 @@ class ToxicPollenCloud:
         """Initialize object."""
         self.prop_name = prop_name
         self.anim_player = AnimationPlayer(
-                               self, prop_name,
-                               coordinates_name="topleft",
-                               coordinates_value=coordinates)
+            self, prop_name, coordinates_name="topleft", coordinates_value=coordinates
+        )
 
         self.set_operation_structure()
 
     def set_operation_structure(self):
         """Set other important operational structures.
-        
+
         Those include atributes, methods and other objects."""
-        self.damage         = 1
-        self.facing_right   = True
+        self.damage = 1
+        self.facing_right = True
 
         self.anim_player.switch_animation("appearing")
         self.anim_player.play()
@@ -45,8 +44,7 @@ class ToxicPollenCloud:
         """Execute current update_method method."""
         self.manage_animations()
         self.anim_player.update()
-        if self.anim_player.anim_name in (
-                                      "idle", "idle_reverse"):
+        if self.anim_player.anim_name in ("idle", "idle_reverse"):
             self.damage_live_objects()
 
     def draw(self):
@@ -66,30 +64,23 @@ class ToxicPollenCloud:
                 if self.facing_right:
                     self.anim_player.switch_animation("idle")
                 else:
-                    self.anim_player.switch_animation(
-                                              "idle_reverse")
+                    self.anim_player.switch_animation("idle_reverse")
 
         elif anim_name in ("idle", "idle_reverse"):
             loops_no = self.anim_player.peek_next_loops_no()
             if loops_no >= 3:
-                self.anim_player.switch_animation(
-                                              "disappearing")
+                self.anim_player.switch_animation("disappearing")
 
         elif anim_name == "disappearing":
-            loops_no = \
-                self.anim_player.peek_after_next_loops_no()
+            loops_no = self.anim_player.peek_after_next_loops_no()
             if loops_no >= 1:
-                self.level.remove_obj_from_group(
-                                            self,
-                                            "front_props",
-                                            True) 
+                self.level.remove_obj_from_group(self, "front_props", True)
 
     def damage_live_objects(self):
         """Damage close objects."""
         colliding_sprites = []
 
-        colliding_actors_onscreen = \
-            self.level.onscreen_map["actors"].collide(self)
+        colliding_actors_onscreen = self.level.onscreen_map["actors"].collide(self)
         colliding_sprites.extend(colliding_actors_onscreen)
 
         player = self.level.player
@@ -98,7 +89,8 @@ class ToxicPollenCloud:
 
         for sprite in colliding_sprites:
 
-            try: sprite.suffer_damage(self.damage)
+            try:
+                sprite.suffer_damage(self.damage)
 
             except AttributeError:
                 # XXX

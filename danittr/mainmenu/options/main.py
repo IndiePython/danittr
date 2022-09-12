@@ -7,39 +7,44 @@ them applied.
 """
 
 from collections import deque
-from functools   import partialmethod
+from functools import partialmethod
 
 ### third-party imports
 
 from pygame import (
-                   QUIT, KEYDOWN, K_ESCAPE, K_RETURN,
-                   K_w, K_UP, K_s, K_DOWN,
-                   K_a, K_LEFT, K_d, K_RIGHT,
-                   MOUSEBUTTONDOWN, MOUSEMOTION)
+    QUIT,
+    KEYDOWN,
+    K_ESCAPE,
+    K_RETURN,
+    K_w,
+    K_UP,
+    K_s,
+    K_DOWN,
+    K_a,
+    K_LEFT,
+    K_d,
+    K_RIGHT,
+    MOUSEBUTTONDOWN,
+    MOUSEMOTION,
+)
 
 from pygame.display import update
-from pygame.event   import get  as get_events
-from pygame.draw    import rect as draw_rect
+from pygame.event import get as get_events
+from pygame.draw import rect as draw_rect
 
 ### local imports
 
-from ...config import (
-                   SCREEN, SCREEN_RECT,
-                   DEFAULT_SETTINGS, USER_SETTINGS)
+from ...config import SCREEN, SCREEN_RECT, DEFAULT_SETTINGS, USER_SETTINGS
 
 from ...appcommon.task import update_task_manager
 from ...appcommon.surf import render_rect
 from ...appcommon.autoblit import BlitterSet
-from ...appcommon.exception import (
-                                  QuitGameException,
-                                  ManagerSwitchException)
+from ...appcommon.exception import QuitGameException, ManagerSwitchException
 from ...appcommon.text.main import render_text
 
 from ...appcommon.behaviour.setting import apply_user_settings
 
-from .widgets import (
-                                      VolumeScale,
-                                      get_button)
+from .widgets import VolumeScale, get_button
 from .controls import ControlsWidget
 
 from ...sound import SOUNDS_MAP
@@ -48,19 +53,19 @@ from ...palette import CERULEAN, BLACK, WHITE, SKY_COLOR
 
 class OptionsWidget(object):
     """Widget for setting up a new game and its data.
-    
+
     The user is prompted for a name for a new save."""
+
     def __init__(self, main_menu):
         """Set variables and perform setups.
-        
+
         main_menu
             The instance of the mainmenu.main.MainMenu class.
         """
         self.main_menu = main_menu
 
         self.set_labels()
-        self.background = \
-             render_rect(*SCREEN_RECT.size, color=SKY_COLOR) 
+        self.background = render_rect(*SCREEN_RECT.size, color=SKY_COLOR)
         self.control_widget = ControlsWidget(self)
         self.build_widgets()
 
@@ -69,18 +74,24 @@ class OptionsWidget(object):
         self.labels = BlitterSet()
 
         text01 = "Music Volume"
-        label01 = render_text(text01, 32,
-                              foreground_color=WHITE,
-                              background_color=BLACK,
-                              return_obj=True,
-                              coordinates_value=(100, 130))
+        label01 = render_text(
+            text01,
+            32,
+            foreground_color=WHITE,
+            background_color=BLACK,
+            return_obj=True,
+            coordinates_value=(100, 130),
+        )
 
         text02 = "SFX Volume"
-        label02 = render_text(text02, 32,
-                              foreground_color=WHITE,
-                              background_color=BLACK,
-                              return_obj=True,
-                              coordinates_value=(100, 250))
+        label02 = render_text(
+            text02,
+            32,
+            foreground_color=WHITE,
+            background_color=BLACK,
+            return_obj=True,
+            coordinates_value=(100, 250),
+        )
 
         self.labels.update([label01, label02])
 
@@ -92,33 +103,32 @@ class OptionsWidget(object):
         update_command = apply_user_settings
 
         ### Music volume
-        self.widgets_deque.append(VolumeScale(
-                                           USER_SETTINGS,
-                                           "music_volume",
-                                           (100, 180),
-                                           update_command))
+        self.widgets_deque.append(
+            VolumeScale(USER_SETTINGS, "music_volume", (100, 180), update_command)
+        )
 
         jump_sound = SOUNDS_MAP["player_jump01"]
 
         ### Sound volume
         self.widgets_deque.append(
-                           VolumeScale(USER_SETTINGS,
-                                       "sound_volume",
-                                       (100, 300),
-                                       update_command,
-                                       jump_sound.play))
+            VolumeScale(
+                USER_SETTINGS,
+                "sound_volume",
+                (100, 300),
+                update_command,
+                jump_sound.play,
+            )
+        )
 
         ### Restore defaults
-        self.widgets_deque.append(get_button(
-                                   "Restore volume defaults",
-                                   (100, 400),
-                                   self.restore_defaults))
+        self.widgets_deque.append(
+            get_button("Restore volume defaults", (100, 400), self.restore_defaults)
+        )
 
         ### Configure controls
-        self.widgets_deque.append(get_button(
-                                     "Configure controls",
-                                     (100, 520),
-                                     self.switch_to_control))
+        self.widgets_deque.append(
+            get_button("Configure controls", (100, 520), self.switch_to_control)
+        )
 
         ### Create group to help manage blitting
         self.widgets = BlitterSet(self.widgets_deque)
@@ -138,8 +148,7 @@ class OptionsWidget(object):
 
             elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    raise ManagerSwitchException(
-                                            self.main_menu)
+                    raise ManagerSwitchException(self.main_menu)
 
                 elif event.key == K_RETURN:
                     self.invoke_button()
@@ -152,13 +161,17 @@ class OptionsWidget(object):
 
                 elif event.key in (K_a, K_LEFT):
 
-                    try: self.current_widget.decrease()
-                    except AttributeError: pass
+                    try:
+                        self.current_widget.decrease()
+                    except AttributeError:
+                        pass
 
                 elif event.key in (K_d, K_RIGHT):
 
-                    try: self.current_widget.increase()
-                    except AttributeError: pass
+                    try:
+                        self.current_widget.increase()
+                    except AttributeError:
+                        pass
 
             ### Mouse
 
@@ -188,7 +201,7 @@ class OptionsWidget(object):
 
     def switch_widget(self, steps=0):
         """Switch widgets by steps.
-        
+
         steps
             integers representing how many the widgets deque
             should rotate.
@@ -199,7 +212,7 @@ class OptionsWidget(object):
         self.highlight_rect = self.current_widget.rect
         SOUNDS_MAP["gui_step"].play()
 
-    go_up   = partialmethod(switch_widget,  1)
+    go_up = partialmethod(switch_widget, 1)
     go_down = partialmethod(switch_widget, -1)
 
     def mouse_motion_routine(self, mouse_position):
@@ -254,18 +267,18 @@ class OptionsWidget(object):
 
     def restore_defaults(self):
         """Restore volume defaults."""
-        USER_SETTINGS["music_volume"] = \
-        DEFAULT_SETTINGS["music_volume"]
+        USER_SETTINGS["music_volume"] = DEFAULT_SETTINGS["music_volume"]
 
-        USER_SETTINGS["sound_volume"] = \
-        DEFAULT_SETTINGS["sound_volume"]
+        USER_SETTINGS["sound_volume"] = DEFAULT_SETTINGS["sound_volume"]
 
         apply_user_settings()
 
         for widget in self.widgets_deque:
 
-            try: widget.place_handle()
-            except AttributeError: pass
+            try:
+                widget.place_handle()
+            except AttributeError:
+                pass
 
     def switch_to_control(self):
         """Switch update manager to control widget."""
@@ -273,5 +286,7 @@ class OptionsWidget(object):
 
     def invoke_button(self):
         """Invoke current widget, if it can be invoked."""
-        try: self.current_widget.invoke()
-        except AttributeError: pass
+        try:
+            self.current_widget.invoke()
+        except AttributeError:
+            pass

@@ -6,37 +6,39 @@ change settings in the USER_SETTING["keys_map"] mapping and have them applied.
 """
 
 from collections import deque
-from functools   import partialmethod
+from functools import partialmethod
 
 ### third-party imports
 
 from pygame import (
-                   QUIT, KEYDOWN, K_ESCAPE, K_RETURN,
-                   K_w, K_UP, K_s, K_DOWN,
-                   MOUSEBUTTONDOWN, MOUSEMOTION)
+    QUIT,
+    KEYDOWN,
+    K_ESCAPE,
+    K_RETURN,
+    K_w,
+    K_UP,
+    K_s,
+    K_DOWN,
+    MOUSEBUTTONDOWN,
+    MOUSEMOTION,
+)
 
-from pygame.key     import name as name_key
-from pygame.draw    import rect as draw_rect
-from pygame.event   import get  as get_events
+from pygame.key import name as name_key
+from pygame.draw import rect as draw_rect
+from pygame.event import get as get_events
 from pygame.display import update
 
 ### local imports
 
-from ...config import (
-                   SCREEN, SCREEN_RECT,
-                   USER_SETTINGS, DEFAULT_SETTINGS, KEYS_MAP)
+from ...config import SCREEN, SCREEN_RECT, USER_SETTINGS, DEFAULT_SETTINGS, KEYS_MAP
 
 from ...common.behaviour import empty_function
 
 from ...appcommon.surf import render_rect
 from ...appcommon.style import give_depth_finish
-from ...appcommon.dialog import (
-                                cache_message,
-                                display_message)
+from ...appcommon.dialog import cache_message, display_message
 from ...appcommon.autoblit import BlitterSet
-from ...appcommon.exception import (
-                                QuitGameException,
-                                ManagerSwitchException)
+from ...appcommon.exception import QuitGameException, ManagerSwitchException
 from ...appcommon.text.main import render_text
 from ...appcommon.behaviour.setting import apply_user_settings
 
@@ -52,15 +54,17 @@ from ...keymapping import VALID_KEYS_MAP
 # of their integer values; this ways the same controls
 # scheme can be used in different systems;
 
+
 class ControlsWidget:
     """Widget for setting up custom controls.
-    
+
     The user is allowed to change controls for some
     specific actions.
     """
+
     def __init__(self, options_widget):
         """Set variables and perform setups.
-        
+
         options_widget
             The instance of mainmenu.options.OptionsWidget.
         """
@@ -69,23 +73,19 @@ class ControlsWidget:
         self.set_labels()
 
         ### Instantiate and store a background surface
-        self.background = \
-             render_rect(*SCREEN_RECT.size, color=SKY_COLOR)
+        self.background = render_rect(*SCREEN_RECT.size, color=SKY_COLOR)
 
         self.build_widgets()
         self.set_other_objects()
 
         cache_message(
-               "not_free",
-               "The key you chose is already being used" \
-               + " in another action")
-        cache_message(
-               "not_valid",
-               "The key you chose isn't considered valid.")
+            "not_free", "The key you chose is already being used" + " in another action"
+        )
+        cache_message("not_valid", "The key you chose isn't considered valid.")
 
         ### define behaviours
 
-        self.draw    = self.draw_control_widgets
+        self.draw = self.draw_control_widgets
         self.control = self.handle_events
 
     def set_labels(self):
@@ -93,50 +93,50 @@ class ControlsWidget:
         self.labels = BlitterSet()
 
         self.texts = [
-          "Player left movement",
-          "Player right movement",
-          "Player up movement",
-          "Player down movement",
-          "Player jump movement",
-          "Player fire item action",
-          "Player interact action",
-          "Advance dialogue/deny prompt",
-          "Accept prompt"
+            "Player left movement",
+            "Player right movement",
+            "Player up movement",
+            "Player down movement",
+            "Player jump movement",
+            "Player fire item action",
+            "Player interact action",
+            "Advance dialogue/deny prompt",
+            "Accept prompt",
         ]
         y = 25
         self.max_width = 0
         for text in self.texts:
-            label = render_text(text, 32,
-                                foreground_color=WHITE,
-                                background_color=BLACK,
-                                return_obj=True,
-                                coordinates_value=(60, y))
+            label = render_text(
+                text,
+                32,
+                foreground_color=WHITE,
+                background_color=BLACK,
+                return_obj=True,
+                coordinates_value=(60, y),
+            )
             label.text = text
             y += 60
             self.labels.add(label)
 
-            self.max_width = max(self.max_width,
-                                 label.rect.w)
+            self.max_width = max(self.max_width, label.rect.w)
 
         for label in self.labels:
-            label.rect.x = \
-                label.rect.x + self.max_width - label.rect.w
-
+            label.rect.x = label.rect.x + self.max_width - label.rect.w
 
     def build_widgets(self):
         """Create option widgets."""
         self.widgets_deque = deque()
 
         fields = [
-          "player_left",
-          "player_right",
-          "player_up",
-          "player_down",
-          "jump",
-          "fire_item",
-          "interact",
-          "advance_deny",
-          "accept_prompt"
+            "player_left",
+            "player_right",
+            "player_up",
+            "player_down",
+            "jump",
+            "fire_item",
+            "interact",
+            "advance_deny",
+            "accept_prompt",
         ]
 
         arbitrary_offset = 80
@@ -148,8 +148,8 @@ class ControlsWidget:
             self.widgets_deque.append(widget)
             y += 60
         self.widgets_deque.append(
-            get_button("Restore default controls", (x, y),
-                       self.restore_defaults))
+            get_button("Restore default controls", (x, y), self.restore_defaults)
+        )
 
         self.widgets = BlitterSet(self.widgets_deque)
 
@@ -163,38 +163,38 @@ class ControlsWidget:
         txt01 = "Please, type the new key"
         txt02 = "for the action you chose:"
         txt03 = "(or press <ESCAPE> if you want to cancel)"
-        type_prompt01 = \
-            render_text(txt01, font_size=42,
-                        foreground_color=WHITE,
-                        background_color=BLACK,
-                        return_obj=True)
+        type_prompt01 = render_text(
+            txt01,
+            font_size=42,
+            foreground_color=WHITE,
+            background_color=BLACK,
+            return_obj=True,
+        )
 
-        type_prompt02 = \
-            render_text(txt02, font_size=42,
-                         foreground_color=WHITE,
-                         background_color=BLACK,
-                         return_obj=True)
-        type_prompt03 = \
-            render_text(txt03, font_size=28,
-                         foreground_color=WHITE,
-                         background_color=BLACK,
-                         return_obj=True)
+        type_prompt02 = render_text(
+            txt02,
+            font_size=42,
+            foreground_color=WHITE,
+            background_color=BLACK,
+            return_obj=True,
+        )
+        type_prompt03 = render_text(
+            txt03,
+            font_size=28,
+            foreground_color=WHITE,
+            background_color=BLACK,
+            return_obj=True,
+        )
 
-        type_prompt01.rect.midbottom = \
-        type_prompt02.rect.midtop    = \
-        SCREEN_RECT.center
+        type_prompt01.rect.midbottom = type_prompt02.rect.midtop = SCREEN_RECT.center
 
-        self.action_name_topleft = \
-                              type_prompt02.rect.bottomleft
+        self.action_name_topleft = type_prompt02.rect.bottomleft
 
-        type_prompt03.rect.bottomright = \
-                                    SCREEN_RECT.bottomright
+        type_prompt03.rect.bottomright = SCREEN_RECT.bottomright
         type_prompt03.rect.x += -35
         type_prompt03.rect.y += -35
 
-        self.prompt_labels.update([type_prompt01,
-                                   type_prompt02,
-                                   type_prompt03])
+        self.prompt_labels.update([type_prompt01, type_prompt02, type_prompt03])
 
     def handle_events(self):
         """Update widget state based on event_queue."""
@@ -206,8 +206,7 @@ class ControlsWidget:
             elif event.type == KEYDOWN:
 
                 if event.key == K_ESCAPE:
-                    raise ManagerSwitchException(
-                                       self.options_widget)
+                    raise ManagerSwitchException(self.options_widget)
 
                 elif event.key == K_RETURN:
                     self.invoke_button()
@@ -240,21 +239,20 @@ class ControlsWidget:
 
     def change_field_key(self, field):
         """Change the field key input."""
-        self.field  = field
+        self.field = field
 
-        self.current_label = \
-            [label for label in self.labels
-             if self.current_widget.text == label.text].pop()
+        self.current_label = [
+            label for label in self.labels if self.current_widget.text == label.text
+        ].pop()
 
-        self.draw    = self.show_key_prompt
+        self.draw = self.show_key_prompt
         self.control = self.get_new_key
 
     def show_key_prompt(self):
         """Prompt user to type new key."""
         SCREEN.blit(self.background, (0, 0))
         self.prompt_labels.draw()
-        SCREEN.blit(self.current_label.image,
-                    self.action_name_topleft)
+        SCREEN.blit(self.current_label.image, self.action_name_topleft)
 
         update()
 
@@ -268,15 +266,16 @@ class ControlsWidget:
 
                 if event.key == K_ESCAPE:
 
-                    self.draw    = self.draw_control_widgets
+                    self.draw = self.draw_control_widgets
                     self.control = self.handle_events
 
-                else: self.check_key(event.key)
+                else:
+                    self.check_key(event.key)
 
     def check_key(self, key):
         """Verify and switch key if appropriate."""
         valid = key in VALID_KEYS_MAP.values()
-        free  = key not in KEYS_MAP.values()
+        free = key not in KEYS_MAP.values()
 
         if free and valid:
 
@@ -298,7 +297,7 @@ class ControlsWidget:
 
     def switch_widget(self, steps=0):
         """Switch widgets by steps.
-        
+
         steps
             integers representing how many the widgets deque
             should rotate.
@@ -309,7 +308,7 @@ class ControlsWidget:
         self.highlight_rect = self.current_widget.rect
         SOUNDS_MAP["gui_step"].play()
 
-    go_up   = partialmethod(switch_widget,  1)
+    go_up = partialmethod(switch_widget, 1)
     go_down = partialmethod(switch_widget, -1)
 
     def mouse_motion_routine(self, mouse_position):
@@ -352,13 +351,14 @@ class ControlsWidget:
 
     def restore_defaults(self):
         """Restore control defaults."""
-        USER_SETTINGS["keys_map"].update(
-                                DEFAULT_SETTINGS["keys_map"])
+        USER_SETTINGS["keys_map"].update(DEFAULT_SETTINGS["keys_map"])
 
         for widget in self.widgets:
 
-            try: widget.update_surface()
-            except AttributeError: pass
+            try:
+                widget.update_surface()
+            except AttributeError:
+                pass
 
         apply_user_settings()
 
@@ -374,7 +374,7 @@ class ControlSwitcher:
         """Assign data and perform setups."""
         self.controls_widget = controls_widget
 
-        self.field   = field
+        self.field = field
         self.topleft = topleft
 
         self.update_surface()
@@ -394,13 +394,14 @@ class ControlSwitcher:
         """Update image surface."""
         text = name_key(KEYS_MAP[self.field])
 
-        if text == "return": text = "enter"
+        if text == "return":
+            text = "enter"
 
-        surf = render_text(text, font_size=32,
-                           foreground_color=WHITE,
-                           background_color=BLACK)
+        surf = render_text(
+            text, font_size=32, foreground_color=WHITE, background_color=BLACK
+        )
 
         self.image = give_depth_finish(surf)
 
-        self.rect  = self.image.get_rect()
+        self.rect = self.image.get_rect()
         self.rect.topleft = self.topleft

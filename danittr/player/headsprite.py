@@ -14,7 +14,7 @@ class Head(BasicObject):
         """Initialize superclass and set variables."""
         self.image = render_image("dani_head.png")
 
-        self.rect         = self.image.get_rect()
+        self.rect = self.image.get_rect()
         self.rect.topleft = (30, 30)
 
         self.update = empty_function

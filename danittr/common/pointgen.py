@@ -35,10 +35,10 @@
 # straight. If up and down speed is constant, we have a
 # zig-zag:
 #
-# .       .       .    
-#  .     . .     . .   
-#   .   .   .   .   .  
-#    . .     . .     . 
+# .       .       .
+#  .     . .     . .
+#   .   .   .   .   .
+#    . .     . .     .
 #     .       .       .
 #
 # Also, instead of translating the points per se, you could
@@ -50,12 +50,12 @@
 #
 # edit: this should become a docstring
 
-from math            import pi, sin, cos, hypot
-from collections     import deque
+from math import pi, sin, cos, hypot
+from collections import deque
 from collections.abc import Sequence
-from random          import seed, shuffle, sample
-from itertools       import cycle
-from copy            import deepcopy
+from random import seed, shuffle, sample
+from itertools import cycle
+from copy import deepcopy
 
 ### local imports
 
@@ -75,6 +75,7 @@ from .indexgen import generate_indices
 ### utility function (use elsewhere, may also be used here
 ### if needed)
 
+
 def convert_items_to_tuples(point_sequence):
     """Convert items in a sequence to tuples.
 
@@ -87,7 +88,9 @@ def convert_items_to_tuples(point_sequence):
     for i in range(len(point_sequence)):
         point_sequence[i] = tuple(point_sequence[i])
 
+
 ### main function
+
 
 def generate_points(pos_data, pos_map={}):
     """Return points list after generating/changing them.
@@ -103,7 +106,8 @@ def generate_points(pos_data, pos_map={}):
 
     ### if data provided is list, then you don't need to
     ### process anything; just return it
-    if isinstance(pos_data, list): return pos_data
+    if isinstance(pos_data, list):
+        return pos_data
 
     ### process operation to
     ### retrieve/load/generate/alter points
@@ -111,14 +115,14 @@ def generate_points(pos_data, pos_map={}):
 
     ## retrieve point list from pos_map
     if name == "retrieve_from_map":
-        key    = pos_data["key"]
+        key = pos_data["key"]
         output = pos_map[key]
 
     ## generate point list for a line
     elif name == "line":
-        quantity    = pos_data["how_many_points"]
+        quantity = pos_data["how_many_points"]
         start_point = pos_data.get("start_point", (0, 0))
-        end_point   = pos_data["end_point"]
+        end_point = pos_data["end_point"]
 
         distance_x = end_point[0] - start_point[0]
         distance_y = end_point[1] - start_point[1]
@@ -128,8 +132,7 @@ def generate_points(pos_data, pos_map={}):
         # discount presence of start and end point
         existing_discount = -2
 
-        offset_quantity = \
-            quantity + range_offset + existing_discount
+        offset_quantity = quantity + range_offset + existing_discount
 
         x_step = distance_x / offset_quantity
         y_step = distance_y / offset_quantity
@@ -150,13 +153,13 @@ def generate_points(pos_data, pos_map={}):
     elif name == "circle":
 
         quantity = pos_data["how_many_points"]
-        radius   = pos_data["radius"]
+        radius = pos_data["radius"]
 
         output = []
         for k in range(quantity):
-            value = (k * 2 * pi)/quantity
-            x = round(radius*cos(value))
-            y = round(radius*sin(value))
+            value = (k * 2 * pi) / quantity
+            x = round(radius * cos(value))
+            y = round(radius * sin(value))
             point = (x, y)
             output.append(point)
 
@@ -164,8 +167,7 @@ def generate_points(pos_data, pos_map={}):
     ## (translating points of 1st one according to 2nd one)
     elif name == "sequence_to_path":
         ### process sequence content
-        sequence = generate_points(pos_data["sequence"],
-                                    pos_map)
+        sequence = generate_points(pos_data["sequence"], pos_map)
 
         ### process path content
         path = generate_points(pos_data["path"], pos_map)
@@ -176,31 +178,29 @@ def generate_points(pos_data, pos_map={}):
         cyclic_sequence = cycle(sequence)
 
         for point in path:
-            translated_point = \
-                generate_points(
-                  {
-                    "name" : "translate",
-                    "sequence" : [next(cyclic_sequence)],
-                    "sequence2": [point]
-                  }
-                ).pop()
+            translated_point = generate_points(
+                {
+                    "name": "translate",
+                    "sequence": [next(cyclic_sequence)],
+                    "sequence2": [point],
+                }
+            ).pop()
 
             output.append(translated_point)
 
     ## generate point list by repeating points
     elif name == "repeat":
         how_many_times = pos_data["how_many_times"]
-        sequence = generate_points(pos_data["sequence"],
-                                    pos_map)
+        sequence = generate_points(pos_data["sequence"], pos_map)
 
         output = sequence * how_many_times
 
     ## generate point list by simulating accel. movement
     elif name == "from_accelerated_movement":
-        start_point  = pos_data.get("start_point", [0, 0])
-        speed        = pos_data.get("speed", [0, 0])
+        start_point = pos_data.get("start_point", [0, 0])
+        speed = pos_data.get("speed", [0, 0])
         acceleration = pos_data.get("acceleration", [0, 0])
-        quantity     = pos_data.get("how_many_points", 0)
+        quantity = pos_data.get("how_many_points", 0)
 
         x, y = start_point
         speed_x, speed_y = speed
@@ -219,8 +219,8 @@ def generate_points(pos_data, pos_map={}):
 
     ## generate point list by movement simulation
     elif name == "spiral":
-        quantity    = pos_data["how_many_points"]
-        resolution  = pos_data["resolution"]
+        quantity = pos_data["how_many_points"]
+        resolution = pos_data["resolution"]
         radius_incr = pos_data["radius_increment"]
 
         cyclic_indices = cycle(range(resolution))
@@ -229,13 +229,9 @@ def generate_points(pos_data, pos_map={}):
         for i in range(quantity):
             radius = i * radius_incr
             circle = generate_points(
-                       {
-                         "name" : "circle",
-                         "how_many_points" : resolution,
-                         "radius" : radius
-                       },
-                       pos_map
-                     )
+                {"name": "circle", "how_many_points": resolution, "radius": radius},
+                pos_map,
+            )
             point = circle[next(cyclic_indices)]
             output.append(point)
 
@@ -247,58 +243,57 @@ def generate_points(pos_data, pos_map={}):
         indices_x = generate_indices(pos_data["indices_x"])
         indices_y = generate_indices(pos_data["indices_y"])
 
-        output = \
-            [(x, y) for x, y in zip(indices_x, indices_y)]
+        output = [(x, y) for x, y in zip(indices_x, indices_y)]
 
     ## generate points from cartesian product of indices
     elif name == "product":
         indices = generate_indices(pos_data["indices"])
         try:
             indices2 = pos_data["indices2"]
-        except KeyError: indices2 = indices
-        else: indices2 = generate_indices(indices2)
+        except KeyError:
+            indices2 = indices
+        else:
+            indices2 = generate_indices(indices2)
 
-        output = \
-            [(x, y) for x in indices for y in indices2]
+        output = [(x, y) for x in indices for y in indices2]
 
     ## generate random point list from points inside rect
     elif name == "random_from_rect":
 
         rect_size = pos_data["size"]
-        quantity  = pos_data["how_many_points"]
+        quantity = pos_data["how_many_points"]
 
         width, height = rect_size
 
-        population = [(x, y) for x in range(width)
-                             for y in range(height)]
+        population = [(x, y) for x in range(width) for y in range(height)]
 
         seed()
         output = sample(population, quantity)
 
     ## generate random point list from points inside circle
     elif name == "random_from_circle":
-        radius   = pos_data["radius"]
+        radius = pos_data["radius"]
         quantity = pos_data["how_many_points"]
 
-        population = [(x, y)
-                      for x in range(-radius, radius+1)
-                      for y in range(-radius, radius+1)
-                      if hypot(x, y) <= radius]
+        population = [
+            (x, y)
+            for x in range(-radius, radius + 1)
+            for y in range(-radius, radius + 1)
+            if hypot(x, y) <= radius
+        ]
 
         seed()
         output = sample(population, quantity)
 
     ## deepcopy a list of positions
     elif name == "deepcopy":
-        sequence = generate_points(pos_data["sequence"],
-                                   pos_map)
+        sequence = generate_points(pos_data["sequence"], pos_map)
 
         output = deepcopy(sequence)
 
     ## change point list by mirroring
     elif name == "mirror":
-        sequence = \
-            generate_points(pos_data["sequence"], pos_map)
+        sequence = generate_points(pos_data["sequence"], pos_map)
 
         use_last = pos_data.get("use_last", True)
 
@@ -313,8 +308,7 @@ def generate_points(pos_data, pos_map={}):
         m_point_x, m_point_y = mirror_point
 
         ### sort temp list according to 'use_last'
-        iterable = \
-            sequence[::-1] if use_last else sequence
+        iterable = sequence[::-1] if use_last else sequence
 
         ### generate new points
         output = []
@@ -327,11 +321,9 @@ def generate_points(pos_data, pos_map={}):
                 # increments are either zero or
                 # double inverted distance
                 # depending on axes set to be mirrored
-                x_incr = 2 * (m_point_x - x) \
-                         if mirror_x else 0
+                x_incr = 2 * (m_point_x - x) if mirror_x else 0
 
-                y_incr = 2 * (m_point_y - y) \
-                         if mirror_y else 0
+                y_incr = 2 * (m_point_y - y) if mirror_y else 0
 
                 new_x = x + x_incr
                 new_y = y + y_incr
@@ -348,24 +340,21 @@ def generate_points(pos_data, pos_map={}):
 
     ## change point list by repeating it
     elif name == "repeat_existing":
-        sequence = generate_points(pos_data["sequence"],
-                                   pos_map)
+        sequence = generate_points(pos_data["sequence"], pos_map)
         how_many_times = pos_data["how_many_times"]
         output = sequence * how_many_times
 
     ## change point list by executing pre-defined operation
     elif name == "back_and_forth_from_existing":
-        sequence = generate_points(pos_data["sequence"],
-                                   pos_map)
+        sequence = generate_points(pos_data["sequence"], pos_map)
         first_half = sequence[:]
-        last_half  = sequence[::-1][1:-1]
+        last_half = sequence[::-1][1:-1]
 
         output = first_half + last_half
 
     ## change point list by multiplying existing ones
     elif name == "multiply":
-        sequence = generate_points(pos_data["sequence"],
-                                   pos_map)
+        sequence = generate_points(pos_data["sequence"], pos_map)
 
         multiplier = pos_data.get("multiplier", False)
 
@@ -373,7 +362,9 @@ def generate_points(pos_data, pos_map={}):
         if multiplier:
             ## multiply all points by multiplier
             for item in sequence:
-                seq = [item,] * multiplier
+                seq = [
+                    item,
+                ] * multiplier
                 output.extend(seq)
 
         else:
@@ -384,26 +375,25 @@ def generate_points(pos_data, pos_map={}):
             # position in sequence
             multiplier_map = pos_data["multiplier_map"]
             for index, item in enumerate(sequence):
-                multiplier = multiplier_map.get(
-                                           str(index), 1)
-                seq = [item,] * multiplier
+                multiplier = multiplier_map.get(str(index), 1)
+                seq = [
+                    item,
+                ] * multiplier
 
                 output.extend(seq)
 
     ## change point list by slicing it
     elif name == "slice":
-        sequence = generate_points(pos_data["sequence"],
-                                   pos_map)
+        sequence = generate_points(pos_data["sequence"], pos_map)
         start = pos_data.get("start")
-        stop  = pos_data.get("stop")
-        step  = pos_data.get("step")
+        stop = pos_data.get("stop")
+        step = pos_data.get("step")
 
         output = sequence[start:stop:step]
 
     ## change point list by inverting them
     elif name == "invert":
-        sequence = generate_points(pos_data["sequence"],
-                                   pos_map)
+        sequence = generate_points(pos_data["sequence"], pos_map)
 
         invert_x = pos_data.get("invert_x", False)
         invert_y = pos_data.get("invert_y", False)
@@ -412,18 +402,15 @@ def generate_points(pos_data, pos_map={}):
         # tuples (which represent points); should we
         # convert such points into lists?
 
-        output = [
-          invert_point(point, invert_x, invert_y)
-          for point in sequence
-        ]
+        output = [invert_point(point, invert_x, invert_y) for point in sequence]
 
     ## change point list by translating it
     elif name == "translate":
 
-        sequence = generate_points(pos_data["sequence"],
-                                   pos_map)
+        sequence = generate_points(pos_data["sequence"], pos_map)
 
-        try: sequence2 = pos_data["sequence2"]
+        try:
+            sequence2 = pos_data["sequence2"]
 
         except KeyError:
             delta_x = pos_data.get("delta_x", 0)
@@ -449,8 +436,7 @@ def generate_points(pos_data, pos_map={}):
 
     ## change point list by deque rotating existing ones
     elif name == "deque_rotate":
-        sequence = generate_points(pos_data["sequence"],
-                                   pos_map)
+        sequence = generate_points(pos_data["sequence"], pos_map)
 
         rotation_amount = pos_data["rotation_amount"]
 
@@ -461,8 +447,7 @@ def generate_points(pos_data, pos_map={}):
 
     ## change point list by shuffling them
     elif name == "shuffle":
-        sequence = generate_points(pos_data["sequence"],
-                                   pos_map)
+        sequence = generate_points(pos_data["sequence"], pos_map)
         seed()
         shuffle(sequence)
 
@@ -473,4 +458,5 @@ def generate_points(pos_data, pos_map={}):
     if isinstance(output, Sequence):
         return output
 
-    else: return [output]
+    else:
+        return [output]

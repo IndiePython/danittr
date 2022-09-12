@@ -1,13 +1,13 @@
 """Facility for surface generation for general purposes."""
 
-from itertools       import cycle, chain
+from itertools import cycle, chain
 from collections.abc import Sequence
 
 ### third-party imports
 
-from pygame           import Surface, Rect
+from pygame import Surface, Rect
 from pygame.transform import flip as flip_surface
-from pygame.draw      import line as draw_line
+from pygame.draw import line as draw_line
 
 ### local imports
 
@@ -31,7 +31,7 @@ def generate_surfaces(surf_data, surf_map={}):
 
     ## retrieve from surf_map
     if name == "retrieve_from_map":
-        key   = surf_data["key"]
+        key = surf_data["key"]
         output = surf_map[key]
 
     ## load from disk
@@ -61,13 +61,14 @@ def generate_surfaces(surf_data, surf_map={}):
 
         output = []
 
-        try: sprite_size = surf_data["sprite_size"]
+        try:
+            sprite_size = surf_data["sprite_size"]
 
         ## use specified rects to retrieve each sprite
         except KeyError:
             rects_parameters = surf_data["rects_parameters"]
             for rect_params in rects_parameters:
-                rect    = Rect(rect_params)
+                rect = Rect(rect_params)
                 subsurf = spritesheet.subsurface(rect)
                 output.append(subsurf)
 
@@ -78,22 +79,21 @@ def generate_surfaces(surf_data, surf_map={}):
             quantity = surf_data["how_many_sprites"]
             sprite_width, sprite_height = sprite_size
             spritesheet_width = spritesheet.get_width()
-            sprites_per_row = \
-                       spritesheet_width // sprite_width
+            sprites_per_row = spritesheet_width // sprite_width
 
             # create a cycle to count in which row
             # you are when iterating
             row_counter = cycle(range(sprites_per_row))
 
-            row    = next(row_counter)
+            row = next(row_counter)
             column = 0
             for _ in range(quantity):
-                x = sprite_width  * row
+                x = sprite_width * row
                 y = sprite_height * column
 
                 # create rect and use it to create
                 # subsurf
-                rect    = Rect(x, y, *sprite_size)
+                rect = Rect(x, y, *sprite_size)
                 subsurf = spritesheet.subsurface(rect)
 
                 # store subsurf
@@ -102,7 +102,8 @@ def generate_surfaces(surf_data, surf_map={}):
                 # get next row;
                 # if it equals zero, increment column;
                 row = next(row_counter)
-                if row == 0: column += 1
+                if row == 0:
+                    column += 1
 
     ## use an invisible surf
     elif name == "invisible":
@@ -112,17 +113,13 @@ def generate_surfaces(surf_data, surf_map={}):
     ## object in blender software
     elif name == "create_empty":
 
-        surf = Surface(
-                 surf_data["dimensions"]).convert_alpha()
+        surf = Surface(surf_data["dimensions"]).convert_alpha()
 
         surf.fill((0, 0, 0, 0))
 
         rect = surf.get_rect()
 
-        lines = [
-          [rect.midtop, rect.midbottom],
-          [rect.midleft, rect.midright]
-        ]
+        lines = [[rect.midtop, rect.midbottom], [rect.midleft, rect.midright]]
 
         for line in lines:
             draw_line(surf, (0, 0, 0), *line, 3)
@@ -131,33 +128,26 @@ def generate_surfaces(surf_data, surf_map={}):
 
     ## change surf list by slicing it
     elif name == "slice":
-        surfaces = \
-          generate_surfaces(
-            surf_data["surface_data"], surf_map)
+        surfaces = generate_surfaces(surf_data["surface_data"], surf_map)
 
         start = surf_data.get("start")
-        stop  = surf_data.get("stop")
-        step  = surf_data.get("step")
+        stop = surf_data.get("stop")
+        step = surf_data.get("step")
 
         output = surfaces[start:stop:step]
 
     ## change surf list by flipping its surfaces
     elif name == "flip":
-        surfaces = \
-          generate_surfaces(
-            surf_data["surface_data"], surf_map)
+        surfaces = generate_surfaces(surf_data["surface_data"], surf_map)
 
         flip_x = surf_data.get("flip_x", False)
         flip_y = surf_data.get("flip_y", False)
 
-        output = [flip_surface(surf, flip_x, flip_y)
-                       for surf in surfaces]
+        output = [flip_surface(surf, flip_x, flip_y) for surf in surfaces]
 
     ## change surf list by deepcopying surfs
     elif name == "deepcopy":
-        surfaces = \
-          generate_surfaces(
-            surf_data["surface_data"], surf_map)
+        surfaces = generate_surfaces(surf_data["surface_data"], surf_map)
 
         output = [surf.copy() for surf in surfaces]
 
@@ -170,8 +160,8 @@ def generate_surfaces(surf_data, surf_map={}):
         # generate a list of surfaces for each surface data
 
         lists = [
-          generate_surfaces(surface_data, surf_map)
-          for surface_data in surface_sequences
+            generate_surfaces(surface_data, surf_map)
+            for surface_data in surface_sequences
         ]
 
         # finally concatenate all lists into a single one
@@ -182,4 +172,5 @@ def generate_surfaces(surf_data, surf_map={}):
     if isinstance(output, Sequence):
         return output
 
-    else: return [output]
+    else:
+        return [output]

@@ -15,7 +15,7 @@ class Node(BasicObject):
     It provides operations to change its positions over time
     relative to a parent node which can be (re)assigned
     anytime to the 'parent' attribute.
-    
+
     Thanks to that, it can be easily (re)arranged into
     multiple combinations with other instances into a
     tree structure just by having a parent assigned to each
@@ -48,22 +48,22 @@ class Node(BasicObject):
 
         ## Create normal rect/image attributes
         width, height = geometry_data["dimensions"]
-        self.rect     = Rect((0, 0), (width, height))
+        self.rect = Rect((0, 0), (width, height))
 
         ## Process collision data if existent
 
-        try: collision_data = geometry_data["collision_data"]
+        try:
+            collision_data = geometry_data["collision_data"]
 
-        except KeyError: self.col_rect = None
+        except KeyError:
+            self.col_rect = None
 
         else:
             ## Create col_rect attribute for collisions
 
             width, height = collision_data["dimensions"]
-            self.col_rect = Rect(self.rect.topleft,
-                                 (width, height))
-            self.col_rect_offset = \
-                        collision_data.get("offset", (0, 0))
+            self.col_rect = Rect(self.rect.topleft, (width, height))
+            self.col_rect_offset = collision_data.get("offset", (0, 0))
 
     def set_pos(self, relative_pos):
         """Set node position relative to parent.
@@ -74,8 +74,8 @@ class Node(BasicObject):
         """
         ### try moving the rect center to the moved center
         ### of the parent
-        try: self.rect.center = \
-                   self.parent.rect.move(relative_pos).center
+        try:
+            self.rect.center = self.parent.rect.move(relative_pos).center
 
         ### if parent is None (an attribute error will be
         ### raised trying to access 'rect') check if rect
@@ -87,17 +87,15 @@ class Node(BasicObject):
             try:
 
                 # invert collision rect offset
-                inverted_pos = \
-                    invert_point(
-                        self.col_rect_offset, True, True)
+                inverted_pos = invert_point(self.col_rect_offset, True, True)
 
                 # offset rect
-                self.rect.center = \
-                    self.col_rect.move(inverted_pos).center
+                self.rect.center = self.col_rect.move(inverted_pos).center
 
             ## do nothing if inexistence of col_rect_offset
             ## attribute causes an error
-            except AttributeError: pass
+            except AttributeError:
+                pass
 
         ### if everything went ok, we just
         ### check if col_rect needs to be positioned
@@ -105,12 +103,13 @@ class Node(BasicObject):
 
             ## try positioning col_rect relative to rect.
 
-            try: self.col_rect.center = \
-                 self.rect.move(self.col_rect_offset).center
+            try:
+                self.col_rect.center = self.rect.move(self.col_rect_offset).center
 
             ## do nothing if inexistence of col_rect_offset
             ## attribute causes and error
-            except AttributeError: pass
+            except AttributeError:
+                pass
 
     def get_distance_from_parent(self):
         """Return 2-tuple of x and y distance from parent.
@@ -120,9 +119,7 @@ class Node(BasicObject):
         """
         ### get the inverted center of parent
 
-        inv_parent_center = invert_point(
-                                     self.parent.rect.center,
-                                     True, True)
+        inv_parent_center = invert_point(self.parent.rect.center, True, True)
 
         ### return the center of a rect obtained from
         ### moving the node rect towards the inverted

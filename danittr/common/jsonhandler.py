@@ -16,7 +16,7 @@ def load_json(filepath):
     except FileNotFoundError as err:
         print("File not found: {}".format(filepath))
         raise err
-    
+
     return data
 
 
@@ -41,21 +41,17 @@ def save_json(data, filepath):
     except FileNotFoundError as err:
         if not filepath in str(err):
             raise err
-        
+
     ### only then try to save
     try:
         with open(filepath, mode="w", encoding="utf-8") as w:
-            dump(data, w,
-                 ensure_ascii=False,
-                 indent=2,
-                 sort_keys=True)
+            dump(data, w, ensure_ascii=False, indent=2, sort_keys=True)
 
     ### if something go wrong, save the backup back
     except Exception as err:
 
         if has_backup:
-            with open(filepath, mode="w",
-                      encoding="utf-8") as w:
+            with open(filepath, mode="w", encoding="utf-8") as w:
                 w.write(backup)
 
         raise Exception from err

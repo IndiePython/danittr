@@ -30,8 +30,7 @@ class Mushroom:
     until it is finally used, switching to the proper state.
     """
 
-    def __init__(self, prop_name, coordinates, level,
-                 plant=None):
+    def __init__(self, prop_name, coordinates, level, plant=None):
         """Initialize superclass and variables.
 
         prop_name
@@ -50,9 +49,11 @@ class Mushroom:
         self.prop_name = prop_name
 
         self.anim_player = AnimationPlayer(
-                              self, prop_name,
-                              coordinates_name="bottomleft",
-                              coordinates_value=coordinates)
+            self,
+            prop_name,
+            coordinates_name="bottomleft",
+            coordinates_value=coordinates,
+        )
 
         self.level = level
         self.plant = plant
@@ -60,22 +61,21 @@ class Mushroom:
 
     def set_operation_structure(self):
         """Set other important operational structures.
-        
+
         Those include atributes, methods and other objects."""
-        self.top_speed      = 10
-        self.x_speed        = 0
+        self.top_speed = 10
+        self.x_speed = 0
         self.x_acceleration = 1
 
-        self.y_speed       = 0
+        self.y_speed = 0
         self.gravity_accel = 2
 
         self.facing_right = True
-        self.is_burst     = False
+        self.is_burst = False
 
-        self.toxic_pollen_cloud = \
-                 ToxicPollenCloud("toxic_pollen_cloud",
-                                  self.rect.topleft,
-                                  self.level)
+        self.toxic_pollen_cloud = ToxicPollenCloud(
+            "toxic_pollen_cloud", self.rect.topleft, self.level
+        )
         self.anim_player.play()
 
     def prepare_for_plant(self):
@@ -88,7 +88,7 @@ class Mushroom:
 
     def prepare_for_usage(self, player):
         """Make it usage ready.
-        
+
         player
             An instance of player.main.Player class.
         """
@@ -101,8 +101,7 @@ class Mushroom:
         else:
             self.facing_right = False
             self.x_speed = -10
-            self.anim_player.switch_animation(
-                                         "thrown_reverse")
+            self.anim_player.switch_animation("thrown_reverse")
             self.rect.bottomright = player.rect.topleft
 
         self.y_speed = -26
@@ -152,26 +151,21 @@ class Mushroom:
 
         elif anim_name == "bursting":
 
-            loops_no = \
-            self.anim_player.peek_after_next_loops_no()
+            loops_no = self.anim_player.peek_after_next_loops_no()
 
             if loops_no >= 1:
                 self.spawn_pollen_cloud()
-                self.level.remove_obj_from_group(
-                                        self,
-                                        "equippable_items",
-                                        True)
+                self.level.remove_obj_from_group(self, "equippable_items", True)
 
     def move_x(self):
         """Calculate and perform movement in x axis."""
-        if self.is_burst: return
+        if self.is_burst:
+            return
 
         self.rect.x += self.x_speed
 
         for group_name in ("blocks", "actors"):
-            collided_prop = \
-                self.level.onscreen_map[
-                                group_name].collide_any(self)
+            collided_prop = self.level.onscreen_map[group_name].collide_any(self)
             if collided_prop:
                 self.burst()
                 break
@@ -193,9 +187,7 @@ class Mushroom:
         self.rect.y += self.y_speed
 
         for group_name in ("blocks", "actors"):
-            collided_prop = \
-                self.level.onscreen_map[
-                                group_name].collide_any(self)
+            collided_prop = self.level.onscreen_map[group_name].collide_any(self)
             if collided_prop:
                 self.burst()
                 break
@@ -228,9 +220,7 @@ class Mushroom:
         """Insert toxic pollen cloud into level."""
         self.toxic_pollen_cloud.prepare_to_enter(self)
 
-        self.level.add_obj_to_group(
-                            self.toxic_pollen_cloud,
-                            "front_props")
+        self.level.add_obj_to_group(self.toxic_pollen_cloud, "front_props")
 
     def scroll(self, x, y):
         """Scroll by x and y in respective axis.

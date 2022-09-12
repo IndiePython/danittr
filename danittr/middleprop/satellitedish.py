@@ -4,8 +4,8 @@ from os.path import join, dirname
 
 ### third-party imports
 
-from pygame.draw      import rect  as draw_rect
-from pygame.image     import save  as save_image
+from pygame.draw import rect as draw_rect
+from pygame.image import save as save_image
 from pygame.transform import scale as scale_surface
 
 ### local imports
@@ -32,12 +32,12 @@ from ..palette import BLACK
 
 class SatelliteDish:
     """A satellite dish which performs progress saving."""
-    
+
     level = None
 
     def __init__(self, prop_name, coordinates):
         """Initialize superclass and variables.
-        
+
         prop_name
             A string representing the prop name.
         coordinates
@@ -48,9 +48,11 @@ class SatelliteDish:
         self.prop_name = prop_name
 
         self.anim_player = AnimationPlayer(
-                               self, prop_name,
-                               coordinates_name="bottomleft",
-                               coordinates_value=coordinates)
+            self,
+            prop_name,
+            coordinates_name="bottomleft",
+            coordinates_value=coordinates,
+        )
 
         self.anim_player.play()
 
@@ -59,19 +61,15 @@ class SatelliteDish:
     def set_operational_structure(self):
         """Set additional objects with which to work."""
         ## prepare prompt
-        object_screen_midtop = \
-                 unscroll_coordinates(self.rect.midtop)
+        object_screen_midtop = unscroll_coordinates(self.rect.midtop)
 
-        offset_screen_midtop = \
-                          (object_screen_midtop[0],
-                           object_screen_midtop[1]-32)
+        offset_screen_midtop = (object_screen_midtop[0], object_screen_midtop[1] - 32)
         item_list = [INVISIBLE_SURF]
         prompt_pair = prompt_factory(
-                            "Should I save my progress?",
-                            offset_screen_midtop,
-                            item_list)
+            "Should I save my progress?", offset_screen_midtop, item_list
+        )
         prompt_action = self.trigger_game_saving
-        self.prompt   = (prompt_pair, prompt_action)
+        self.prompt = (prompt_pair, prompt_action)
 
     def update(self):
         """Update object state."""
@@ -141,8 +139,8 @@ class SatelliteDish:
 
     def store_thumbnail(self):
         """Stores a thumbnail in the save directory."""
-        save_dir    = dirname(self.level.save_state_filepath)
-        thumb_path  = join(save_dir, "thumb.png")
+        save_dir = dirname(self.level.save_state_filepath)
+        thumb_path = join(save_dir, "thumb.png")
 
         thumb = scale_surface(SCREEN, (640, 360))
         draw_rect(thumb, BLACK, thumb.get_rect(), 5)

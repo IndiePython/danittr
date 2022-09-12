@@ -1,8 +1,8 @@
 """General utilities for the animation player."""
 
-from abc       import ABC
+from abc import ABC
 from functools import partial, partialmethod
-from operator  import attrgetter
+from operator import attrgetter
 
 ### local import
 from ....common.behaviour import empty_function, get_nested_value
@@ -26,7 +26,7 @@ class Utilities(ABC):
         # (obs.: if needed elsewhere, turn this section into
         # its own method)
 
-        max_index     = self.get_animation_length() - 1
+        max_index = self.get_animation_length() - 1
         clamped_index = max(min(max_index, frame_index), 0)
 
         ### calculate the difference between the desired
@@ -67,10 +67,8 @@ class Utilities(ABC):
         """
         return self.anim_clock.peek_loops_no(steps)
 
-    peek_next_loops_no       = partialmethod(
-                                        peek_loops_no, 1)
-    peek_after_next_loops_no = partialmethod(
-                                        peek_loops_no, 2)
+    peek_next_loops_no = partialmethod(peek_loops_no, 1)
+    peek_after_next_loops_no = partialmethod(peek_loops_no, 2)
 
     def ensure_animation(self, animation_name):
         """Only switch if given animation != current one.
@@ -120,8 +118,10 @@ class Utilities(ABC):
 
     def toggle_play(self):
         """Toggle behaviour between play/pause state."""
-        if self.is_paused(): self.play()
-        else: self.pause()
+        if self.is_paused():
+            self.play()
+        else:
+            self.pause()
 
     ### drawing related options
 
@@ -145,7 +145,7 @@ class Utilities(ABC):
         the special method again would cause another
         undesired effect described in the is_skipping
         method.
-        
+
         Once the conditions above are met, before setting
         the special method, we store a reference to the
         current udpate routine, so it can be restored later.
@@ -163,7 +163,7 @@ class Utilities(ABC):
 
         This is used to prevent trying to set the
         skip_walking method again when it is already set.
-        
+
         Since the skip_walking method automatically sets the
         update routine to its previous value, if the
         previous value of the update routine was itself,
@@ -213,9 +213,10 @@ class Utilities(ABC):
         ### routine_name value checking
 
         if routine_name in (
-          'draw_nodes',
-          'draw_nodes_and_bounding_rect',
-          'draw_nodes_and_col_rect'):
+            "draw_nodes",
+            "draw_nodes_and_bounding_rect",
+            "draw_nodes_and_col_rect",
+        ):
 
             ## routine assignment
             self.draw = getattr(self, routine_name)
@@ -225,9 +226,7 @@ class Utilities(ABC):
 
     ### data queries
 
-    def get_nodes(self,
-        exclude_root=False, order="node_names",
-        reverse=False):
+    def get_nodes(self, exclude_root=False, order="node_names", reverse=False):
         """Return nodes for current animation.
 
         exclude_root (boolean - default is False)
@@ -241,8 +240,7 @@ class Utilities(ABC):
         """
         ### order value checking
 
-        legal_values = (
-        'node_names', 'updating_order', 'drawing_order')
+        legal_values = ("node_names", "updating_order", "drawing_order")
 
         if order in legal_values:
 
@@ -262,14 +260,10 @@ class Utilities(ABC):
             ### exclude_root parameter
 
             if exclude_root:
-                return (
-                  node
-                  for node in nodes
-                  if node is not self.root
-                )
+                return (node for node in nodes if node is not self.root)
 
-            else: return nodes
+            else:
+                return nodes
 
         else:
-            raise ValueError(
-            "order must be in one of: " + str(legal_values))
+            raise ValueError("order must be in one of: " + str(legal_values))

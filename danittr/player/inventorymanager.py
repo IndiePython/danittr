@@ -11,9 +11,10 @@ from ..throwing.mushroom import Mushroom
 # remember to also make the needed changes
 # on the equipped display class.
 
+
 def instantiate_item(item_name, player):
     """Instantiate item based on name.
-    
+
     item_name
         A string representing the name of an equippable
         item. It is used to instantiate it.
@@ -23,10 +24,10 @@ def instantiate_item(item_name, player):
         info.
     """
     if item_name == "mushroom":
-        prop_name   = item_name
+        prop_name = item_name
         coordinates = [0, 0]
-        level       = player.level
-        item        = Mushroom(prop_name, coordinates, level)
+        level = player.level
+        item = Mushroom(prop_name, coordinates, level)
 
     return item
 
@@ -34,10 +35,9 @@ def instantiate_item(item_name, player):
 class InventoryManager:
     """An inventory manager."""
 
-    def __init__(self, state_data, equipped_display,
-                 player):
+    def __init__(self, state_data, equipped_display, player):
         """Initialize object.
-        
+
         state_data
             json data loaded from the slot .stt file.
         equipped_display
@@ -48,13 +48,12 @@ class InventoryManager:
             A reference to a player.main.Player
             instance.
         """
-        self.state_data       = state_data
+        self.state_data = state_data
         self.equipped_display = equipped_display
-        self.player           = player
+        self.player = player
 
-        equipped_item = self.state_data.get("equipped_item",
-                                            "mushroom")
-        self.equipped_item_name  = equipped_item
+        equipped_item = self.state_data.get("equipped_item", "mushroom")
+        self.equipped_item_name = equipped_item
 
         self.prepare_items()
         self.update_equipped_display()
@@ -62,7 +61,7 @@ class InventoryManager:
     def prepare_items(self):
         """Instantiate all present items."""
         self.item_name_deque = deque()
-        self.item_objects    = {}
+        self.item_objects = {}
 
         inventory = self.state_data.get("inventory")
         if inventory:
@@ -72,30 +71,29 @@ class InventoryManager:
 
                 amount = inventory.get(item_name, 0)
                 for n in range(amount):
-                    obj = instantiate_item(item_name,
-                                           self.player)
+                    obj = instantiate_item(item_name, self.player)
                     self.item_objects[item_name].append(obj)
 
     def update_equipped_display(self):
         """Send item and count data to equipped display."""
         inventory = self.state_data.get("inventory")
         if inventory:
-            self.equipped_item_count = \
-                inventory[self.equipped_item_name]
+            self.equipped_item_count = inventory[self.equipped_item_name]
 
             self.equipped_display.update_visual_data(
-                self.equipped_item_name,
-                self.equipped_item_count)
+                self.equipped_item_name, self.equipped_item_count
+            )
 
     def add(self, item):
         """Return True if item is added.
-        
+
         item
             A instance item to be added in the inventory.
         """
         item_name = item.prop_name
 
-        try: amount = self.state_data["inventory"][item_name]
+        try:
+            amount = self.state_data["inventory"][item_name]
 
         except KeyError:
 
@@ -134,7 +132,8 @@ class InventoryManager:
         if self.remove(item_name):
             item = self.item_objects[item_name].pop()
 
-        else: item = None
+        else:
+            item = None
 
         return item
 

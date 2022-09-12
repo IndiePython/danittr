@@ -8,9 +8,7 @@ from ..appcommon.surf import render_image
 from ..appcommon.autoblit import BasicObject
 from ..appcommon.promptfactory import prompt_factory
 from ..appcommon.dialoguefactory import dialoguebox_factory
-from ..appcommon.task import (
-                                      add_task,
-                                      add_sendoff_task)
+from ..appcommon.task import add_task, add_sendoff_task
 from ..throwing.mushroom import Mushroom
 
 
@@ -19,13 +17,11 @@ class MushroomPlant(BasicObject):
 
     level = None
 
-    prop_map = {
-      "mushroom_plant" : render_image("mushroom_plant.png")
-    }
-    
+    prop_map = {"mushroom_plant": render_image("mushroom_plant.png")}
+
     def __init__(self, prop_name, coordinates, has_mushroom):
         """Initialize superclass and variables.
-        
+
         prop_name
             A string representing the prop name.
         coordinates
@@ -38,10 +34,10 @@ class MushroomPlant(BasicObject):
             object.
         """
         self.prop_name = prop_name
-        
+
         self.image = MushroomPlant.prop_map[prop_name]
-        
-        self.rect            = self.image.get_rect()
+
+        self.rect = self.image.get_rect()
         self.rect.bottomleft = coordinates
 
         self.has_mushroom = has_mushroom
@@ -49,20 +45,20 @@ class MushroomPlant(BasicObject):
 
     def set_operation_structure(self):
         """Set other important operational structures.
-        
+
         Those include atributes, methods and other objects."""
         ## prepare prompt
-        self.object_screen_midtop = \
-                 unscroll_coordinates(self.rect.midtop)
+        self.object_screen_midtop = unscroll_coordinates(self.rect.midtop)
         # XXX
         # This offset should be made inside the
         # dialogue/prompt mechanism. Ponder. This tied to
         # the notion that dialogue/prompt feature should
         # have references to the objects instead of
         # receiving their position.
-        offset_screen_midtop = \
-                          (self.object_screen_midtop[0],
-                           self.object_screen_midtop[1]-32)
+        offset_screen_midtop = (
+            self.object_screen_midtop[0],
+            self.object_screen_midtop[1] - 32,
+        )
 
         # must come after defining self.object_screen_midtop
         self.instantiate_mushroom()
@@ -79,20 +75,14 @@ class MushroomPlant(BasicObject):
         item_list.append(surface)
 
         prompt_pair = prompt_factory(
-                                  "Should I take the item?",
-                                  offset_screen_midtop,
-                                  item_list)
+            "Should I take the item?", offset_screen_midtop, item_list
+        )
         prompt_action = self.give_item
-        self.prompt = (prompt_pair, prompt_action) 
+        self.prompt = (prompt_pair, prompt_action)
 
         ## Prepare dialogue
-        dialogue = [
-            {"player" : \
-                "It seems there's no usable mushroom here."}
-        ]
-        self.dialogue = \
-            dialoguebox_factory(dialogue,
-                                offset_screen_midtop)
+        dialogue = [{"player": "It seems there's no usable mushroom here."}]
+        self.dialogue = dialoguebox_factory(dialogue, offset_screen_midtop)
 
         ## Pick suitable method
         self.choose_interaction_method()
@@ -102,9 +92,9 @@ class MushroomPlant(BasicObject):
 
     def instantiate_mushroom(self):
         """Instantiate and store a mushroom."""
-        self.mushroom = \
-            Mushroom("mushroom", self.object_screen_midtop,
-                     self.level, self)
+        self.mushroom = Mushroom(
+            "mushroom", self.object_screen_midtop, self.level, self
+        )
 
         self.mushroom.prepare_for_plant()
 
@@ -121,23 +111,24 @@ class MushroomPlant(BasicObject):
         if self.has_mushroom:
             self.mushroom.update()
 
-        else: self.set_growth_task()
+        else:
+            self.set_growth_task()
 
     def draw(self):
         """Update object state."""
-        if self.has_mushroom: self.mushroom.draw()
+        if self.has_mushroom:
+            self.mushroom.draw()
 
         super().draw()
 
     def set_growth_task(self):
         """Set growth task if needed."""
         if self.growth_task.finished:
-           self.growth_task = \
-               add_task(self.set_mushroom_growth, 5000)
+            self.growth_task = add_task(self.set_mushroom_growth, 5000)
 
     def deliver_prompt(self, player):
         """Send prompt to player.
-        
+
         player
             The instance of player.main.Player.
         """
@@ -145,7 +136,7 @@ class MushroomPlant(BasicObject):
 
     def deliver_dialogue(self, player):
         """Send dialogue to player.
-        
+
         player
             The instance of player.main.Player.
         """
@@ -159,14 +150,16 @@ class MushroomPlant(BasicObject):
 
     def give_item(self):
         """Give item to player and clean variables."""
-        try: player = self.level.player
+        try:
+            player = self.level.player
 
         except AttributeError as err:
             # XXX
             # filter this better
             print(err)
 
-        else: player.get_item(self.mushroom, self)
+        else:
+            player.get_item(self.mushroom, self)
 
     def got_item(self):
         """Make arrangements for itemless state."""

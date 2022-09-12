@@ -18,15 +18,13 @@ class SimpleObject(BasicObject):
     """Simple object to hold sprite."""
 
     def __init__(
-        self, image_name, tasks,
-        exchange_pos_attrs=("center", "center"),
-        offset=(0, 0)):
+        self, image_name, tasks, exchange_pos_attrs=("center", "center"), offset=(0, 0)
+    ):
         """Create attributes."""
         ### store a loaded image attribute and also
         ### reference it on the self.image attribute
 
-        self.image = \
-        self.loaded_image = render_image(image_name)
+        self.image = self.loaded_image = render_image(image_name)
 
         ### create, store and position a pygame.Rect
         ### instance from the surface referenced on the
@@ -58,7 +56,8 @@ class SimpleObject(BasicObject):
         """Turn the object invisible."""
         if visible:
             self.image = self.loaded_image
-        else: self.image = INVISIBLE_SURF
+        else:
+            self.image = INVISIBLE_SURF
 
-    visibility_on  = partialmethod(change_visibility,  True)
+    visibility_on = partialmethod(change_visibility, True)
     visibility_off = partialmethod(change_visibility, False)

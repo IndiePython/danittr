@@ -17,7 +17,7 @@ init_font()
 ### create and process font path map
 
 FONT_PATH_MAP = {
-  "default" : "source_sans_pro_regular.ttf",
+    "default": "source_sans_pro_regular.ttf",
 }
 
 for key, font_name in FONT_PATH_MAP.items():
@@ -31,8 +31,7 @@ FONTS_META_MAP = load_json(FONTS_META_FILE)
 ## create map
 
 CHAR_CODE_MAP = {
-  font_key : FONTS_META_MAP[font_key]
-  for font_key in FONT_PATH_MAP.keys()
+    font_key: FONTS_META_MAP[font_key] for font_key in FONT_PATH_MAP.keys()
 }
 
 
@@ -44,13 +43,15 @@ FONT_MAP = {}
 
 ### utility function for general usage: getting fonts
 
+
 def get_font(size, font_style="default"):
     """Return default font of specified size."""
     ### store arguments in tuple to use as a dictionary key
     key = (font_style, size)
 
     ### try returning font from font map using the key
-    try: return FONT_MAP[key]
+    try:
+        return FONT_MAP[key]
 
     ### otherwise create, store and return the new font obj
     except KeyError:
@@ -65,4 +66,3 @@ def get_font(size, font_style="default"):
 
         FONT_MAP[key] = font
         return font
-

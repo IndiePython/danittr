@@ -17,17 +17,20 @@ def get_tree_values(tree, key_name, children_key_name):
         children mapping.
     """
     values = []
-    try: value = tree[key_name]
-    except KeyError: pass
-    else: values.append(value)
+    try:
+        value = tree[key_name]
+    except KeyError:
+        pass
+    else:
+        values.append(value)
 
-    try: children_data = tree[children_key_name]
-    except KeyError: pass
+    try:
+        children_data = tree[children_key_name]
+    except KeyError:
+        pass
     else:
         for child_data in children_data:
-            child_values = \
-                get_tree_values(
-                    child_data, key_name, children_key_name)
+            child_values = get_tree_values(child_data, key_name, children_key_name)
             values.extend(child_values)
 
     return values
@@ -88,10 +91,12 @@ def get_tree_height(tree, height=0):
 
     """
     ### verify if tree has children
-    try: children = tree["children"]
+    try:
+        children = tree["children"]
 
     ### if there are no children
-    except KeyError: pass
+    except KeyError:
+        pass
 
     ### if it has children, increment the height
     ### and pass it on while calculating the height
@@ -99,10 +104,7 @@ def get_tree_height(tree, height=0):
     else:
         height += 1
 
-        height = max(
-          get_tree_height(child, height)
-          for child in children
-        )
+        height = max(get_tree_height(child, height) for child in children)
 
     ### return final height
     return height

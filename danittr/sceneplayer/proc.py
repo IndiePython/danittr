@@ -34,9 +34,7 @@ def process_tasks(obj, tasks):
 
             anim_name = data["anim_name"]
 
-            callable_ = \
-              partial(
-                obj.anim_player.switch_animation, anim_name)
+            callable_ = partial(obj.anim_player.switch_animation, anim_name)
 
         ### add task with proper time unit
 

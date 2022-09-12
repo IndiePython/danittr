@@ -2,7 +2,7 @@
 
 ### third-party imports
 
-from pygame      import Rect
+from pygame import Rect
 from pygame.draw import rect as draw_rect
 
 ### local imports
@@ -13,13 +13,12 @@ from ..common.behaviour import empty_function
 from ..appcommon.surf import render_rect
 
 
-
 class HealthBar:
     """A health display bar."""
 
     def __init__(self, player):
         """Initialize superclass and set variables.
-        
+
         player
             A reference to player.main.Player instance.
         """
@@ -28,13 +27,11 @@ class HealthBar:
         self.image = render_rect(200, 20)
         self.image.fill((255, 90, 40))
 
-        self.rect    = self.image.get_rect()
+        self.rect = self.image.get_rect()
         self.topleft = (160, 60)
 
-        outline_x, outline_y = (self.topleft[0]-2,
-                                self.topleft[1]-2)
-        self.outline_rect    = Rect((outline_x, outline_y),
-                                    (204, 24))
+        outline_x, outline_y = (self.topleft[0] - 2, self.topleft[1] - 2)
+        self.outline_rect = Rect((outline_x, outline_y), (204, 24))
 
         self.max_health = 100
         self.min_health = 0
@@ -47,7 +44,7 @@ class HealthBar:
 
     def update_width(self, amount=0):
         """Increase or decrease health by amount.
-        
+
         It also updates size according to current health.
 
         amount (defaults to 0)
@@ -55,10 +52,9 @@ class HealthBar:
             subtract (if it is negative) from health.
         """
         self.player.health += amount
-        self.player.health  = \
-            max(min(self.player.health,
-                    self.max_health),
-                    self.min_health)
+        self.player.health = max(
+            min(self.player.health, self.max_health), self.min_health
+        )
         self.rect.width = self.player.health * 2
 
         if not self.player.health and not self.is_dead:
