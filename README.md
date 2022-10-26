@@ -66,14 +66,9 @@ Some of the code (after refactored/improved) and many of the lessons I gained fr
 There's a pit on the highest peak of the level (after climbing all the vegetation, to the left). If you fall there, there is no way to get out, so you'll have to load your save again. It was supposed to have a giant serpent boss for the player to defeat.
 
 
-## Contributing
+## Contributing and Issues
 
-This project is a prototype and isn't under development anymore. It was published for educational purposes only. Please, do not submit pull requests.
-
-
-## Issues
-
-This project is a prototype and isn't under development anymore. It was published for educational purposes only. Please, do not report any issues.
+This project is a prototype and isn't under development anymore. It was published for educational purposes only and is actually archived, so it isn't receiving contributions or issue reports anymore.
 
 Of course, though, if you are having trouble trying to run it, let me know via one of the contact methods below and I'll be glad to help.
 
